@@ -1,4 +1,6 @@
-import "@/styles/editor.css";
+import type React from "react";
+import { useState, useCallback } from "react";
+import { motion } from "motion/react";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
@@ -6,119 +8,159 @@ import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin";
 import { ListPlugin } from "@lexical/react/LexicalListPlugin";
-import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPlugin";
-import { TRANSFORMERS } from "@lexical/markdown";
-import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { CheckListPlugin } from "@lexical/react/LexicalCheckListPlugin";
 import { TablePlugin } from "@lexical/react/LexicalTablePlugin";
 import { HorizontalRulePlugin } from "@lexical/react/LexicalHorizontalRulePlugin";
-import { motion } from "motion/react";
+import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPlugin";
+import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
+import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
+import { TRANSFORMERS } from "@lexical/markdown";
+import EditorTheme from "@/lib/editor/theme";
+import { EDITOR_CONFIG, ANIMATION_CONFIG } from "@/lib/editor/constants";
+import { Toolbar } from "@/components/editor/toolbar";
+import { FloatingToolbar } from "@/components/editor/floating-toolbar";
+import type { EditorProps } from "@/types/editor";
+import { $getRoot, type EditorState, type LexicalEditor } from "lexical";
 
-import { nodes } from "@/lib/editor/nodes";
-import { Toolbar } from "./toolbar";
-import { FloatingToolbar } from "./floating-toolbar";
-
-const theme = {
-  ltr: "ltr",
-  rtl: "rtl",
-  placeholder: "text-muted-foreground/70",
-  paragraph: "mb-3 leading-relaxed",
-  quote:
-    "border-l-4 border-gradient-to-b from-primary/60 to-primary/20 pl-6 py-2 italic text-muted-foreground/90 my-6 bg-accent/20 rounded-r-lg",
-  heading: {
-    h1: "text-4xl font-bold mb-6 mt-8 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent",
-    h2: "text-3xl font-semibold mb-4 mt-6 text-foreground/95",
-    h3: "text-2xl font-medium mb-3 mt-5 text-foreground/90",
-  },
-  list: {
-    nested: {
-      listitem: "list-none",
-    },
-    ol: "list-decimal ml-6 mb-4 space-y-1",
-    ul: "list-disc ml-6 mb-4 space-y-1",
-    listitem: "mb-2 leading-relaxed",
-    checklist: "list-none ml-0 mb-4 space-y-2",
-    listitemChecked:
-      "flex items-start gap-3 mb-2 text-muted-foreground/70 line-through transition-all duration-200",
-    listitemUnchecked:
-      "flex items-start gap-3 mb-2 transition-all duration-200",
-  },
-  text: {
-    bold: "font-semibold text-foreground",
-    italic: "italic",
-    underline: "underline decoration-2 underline-offset-2",
-    code: "bg-accent/80 px-2 py-1 rounded-md text-sm font-mono border shadow-sm",
-    highlight: "px-1 py-0.5 rounded-sm",
-    subscript: "text-xs align-sub",
-    superscript: "text-xs align-super",
-  },
-  code: "bg-accent/60 p-4 rounded-xl font-mono text-sm my-6 overflow-x-auto block border shadow-sm backdrop-blur-sm",
-  link: "text-primary hover:text-primary/80 underline decoration-primary/30 hover:decoration-primary/60 underline-offset-2 transition-all duration-200 cursor-pointer",
-  table:
-    "border-collapse table-auto w-full my-6 border border-border/60 rounded-lg overflow-hidden shadow-sm",
-  tableCell:
-    "border border-border/40 px-4 py-3 min-w-[100px] transition-colors hover:bg-accent/20",
-  tableCellHeader:
-    "border border-border/40 px-4 py-3 bg-accent/60 font-semibold min-w-[100px] backdrop-blur-sm",
-  hr: "my-8 border-t border-gradient-to-r from-transparent via-border to-transparent",
-};
-
-function onError(error: Error) {
-  console.error("Lexical error:", error);
-}
-
-export function Editor() {
-  const initialConfig = {
-    namespace: "PremiumEditor",
-    theme,
-    onError,
-    nodes,
+function EditorContent({
+  placeholder = "Start writing ...",
+  className = "",
+  minHeight = "400px",
+  maxHeight,
+  readOnly = false,
+}: Pick<
+  EditorProps,
+  "placeholder" | "className" | "minHeight" | "maxHeight" | "readOnly"
+>) {
+  const editorStyle = {
+    minHeight,
+    maxHeight,
+    caretColor: "hsl(var(--editor-primary))",
+    lineHeight: "1.7",
   };
 
   return (
-    <LexicalComposer initialConfig={initialConfig}>
-      <motion.div
-        className="relative"
-        initial={{ scale: 0.98 }}
-        animate={{ scale: 1 }}
-        transition={{ duration: 0.4, delay: 0.2 }}
-      >
-        <Toolbar />
-        <div className="relative max-w-6xl mx-auto my-6">
-          <RichTextPlugin
-            contentEditable={
-              <ContentEditable
-                className="p-8 outline-none prose prose-lg max-w-none transition-all duration-300"
-                style={{
-                  minHeight: "600px",
-                  caretColor: "hsl(var(--primary))",
-                  lineHeight: "1.7",
-                }}
-              />
-            }
-            placeholder={
-              <motion.div
-                className="absolute top-8 left-8 text-muted-foreground/60 pointer-events-none select-none text-lg"
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 0.5 }}
-              >
-                Start writing your masterpiece...
-              </motion.div>
-            }
-            ErrorBoundary={LexicalErrorBoundary}
+    <div className="relative">
+      <RichTextPlugin
+        contentEditable={
+          <ContentEditable
+            className={`
+              p-6 md:p-8 
+              outline-none 
+              prose prose-lg max-w-none 
+              transition-all duration-300
+              ${className}
+            `}
+            style={editorStyle}
+            readOnly={readOnly}
           />
-          <HistoryPlugin />
-          <AutoFocusPlugin />
-          <ListPlugin />
-          <CheckListPlugin />
-          <LinkPlugin />
-          <TablePlugin hasCellMerge={true} hasCellBackgroundColor={true} />
-          <HorizontalRulePlugin />
-          <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
-          <FloatingToolbar />
+        }
+        placeholder={
+          <motion.div
+            className="absolute top-6 md:top-8 left-6 md:left-8 text-muted-foreground/60 pointer-events-none select-none text-base md:text-lg"
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={ANIMATION_CONFIG.smooth}
+          >
+            {placeholder}
+          </motion.div>
+        }
+        ErrorBoundary={LexicalErrorBoundary}
+      />
+    </div>
+  );
+}
+
+function EditorPlugins({
+  showFloatingToolbar = true,
+  customPlugins = [],
+  onChange = () => {},
+}: {
+  showFloatingToolbar?: boolean;
+  customPlugins?: React.ComponentType[];
+  onChange: (
+    editorState: EditorState,
+    editor: LexicalEditor,
+    tags: Set<string>
+  ) => void;
+}) {
+  return (
+    <>
+      <HistoryPlugin />
+      <AutoFocusPlugin />
+      <ListPlugin />
+      <CheckListPlugin />
+      <LinkPlugin />
+      <TablePlugin hasCellMerge={true} hasCellBackgroundColor={true} />
+      <HorizontalRulePlugin />
+      <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
+      <OnChangePlugin onChange={onChange} />
+      {showFloatingToolbar && <FloatingToolbar />}
+      {customPlugins.map((Plugin, index) => (
+        <Plugin key={index} />
+      ))}
+    </>
+  );
+}
+
+export function Editor({
+  initialValue = "",
+  placeholder = "Start writing your masterpiece...",
+  className = "",
+  minHeight = "400px",
+  maxHeight,
+  showToolbar = false,
+  showFloatingToolbar = true,
+  readOnly = false,
+  onChange,
+  plugins = [],
+}: EditorProps) {
+  const [editorState, setEditorState] = useState<string>(initialValue);
+
+  const initialConfig = {
+    ...EDITOR_CONFIG,
+    editorState: initialValue ? initialValue : null,
+    theme: EditorTheme,
+    editable: !readOnly,
+  };
+
+  const handleEditorChange = useCallback(
+    (editorState: any) => {
+      const jsonState = editorState.toJSON();
+      const jsonString = JSON.stringify(jsonState);
+
+      editorState.read(() => {
+        const root = $getRoot();
+        const textContent = root.getTextContent();
+        console.log("Plain text:", textContent);
+      });
+
+      setEditorState(jsonString);
+      onChange?.(jsonString);
+    },
+    [onChange]
+  );
+
+  return (
+    <div className={`w-full ${className}`}>
+      <LexicalComposer initialConfig={initialConfig}>
+        <div className=" relative overflow-hidden">
+          {showToolbar && <Toolbar />}
+
+          <EditorContent
+            placeholder={placeholder}
+            minHeight={minHeight}
+            maxHeight={maxHeight}
+            readOnly={readOnly}
+          />
+
+          <EditorPlugins
+            showFloatingToolbar={showFloatingToolbar}
+            customPlugins={plugins}
+            onChange={handleEditorChange}
+          />
         </div>
-      </motion.div>
-    </LexicalComposer>
+      </LexicalComposer>
+    </div>
   );
 }

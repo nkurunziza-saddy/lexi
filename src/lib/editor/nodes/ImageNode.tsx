@@ -3,7 +3,7 @@ import { DecoratorNode } from "lexical";
 import { motion } from "motion/react";
 
 import type { ImageNodeSerialized } from "@/types/editor";
-import { springTransition } from "@/lib/editor/constants";
+import { ANIMATION_CONFIG } from "../constants";
 
 export class ImageNode extends DecoratorNode<JSX.Element> {
   __src: string;
@@ -52,7 +52,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={springTransition}
+        transition={ANIMATION_CONFIG.spring}
         className="my-4"
       >
         <img

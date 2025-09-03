@@ -11,7 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { springTransition } from "@/lib/editor/constants";
+import { ANIMATION_CONFIG } from "@/lib/editor/constants";
 
 export function LinkDialog({
   isOpen,
@@ -49,7 +49,7 @@ export function LinkDialog({
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              transition={springTransition}
+              transition={ANIMATION_CONFIG.spring}
             >
               <DialogHeader>
                 <DialogTitle className="text-xl font-semibold">

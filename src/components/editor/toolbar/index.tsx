@@ -1,41 +1,95 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { motion } from "motion/react";
 import {
-  $getSelection, 
-  $isRangeSelection, 
-  FORMAT_TEXT_COMMAND, 
-  FORMAT_ELEMENT_COMMAND, 
-  SELECTION_CHANGE_COMMAND, 
-  CAN_UNDO_COMMAND, 
-  CAN_REDO_COMMAND, 
-  UNDO_COMMAND, 
-  REDO_COMMAND, 
-  COMMAND_PRIORITY_CRITICAL 
+  $getSelection,
+  $isRangeSelection,
+  FORMAT_TEXT_COMMAND,
+  FORMAT_ELEMENT_COMMAND,
+  SELECTION_CHANGE_COMMAND,
+  CAN_UNDO_COMMAND,
+  CAN_REDO_COMMAND,
+  UNDO_COMMAND,
+  REDO_COMMAND,
+  COMMAND_PRIORITY_CRITICAL,
 } from "lexical";
 import {
   $setBlocksType,
   $getSelectionStyleValueForProperty,
 } from "@lexical/selection";
-import { $createHeadingNode, $createQuoteNode, $isHeadingNode, $isQuoteNode } from "@lexical/rich-text";
-import { INSERT_UNORDERED_LIST_COMMAND, INSERT_ORDERED_LIST_COMMAND, INSERT_CHECK_LIST_COMMAND, $isListNode } from "@lexical/list";
+import {
+  $createHeadingNode,
+  $createQuoteNode,
+  $isHeadingNode,
+  $isQuoteNode,
+} from "@lexical/rich-text";
+import {
+  INSERT_UNORDERED_LIST_COMMAND,
+  INSERT_ORDERED_LIST_COMMAND,
+  INSERT_CHECK_LIST_COMMAND,
+  $isListNode,
+  ListNode,
+} from "@lexical/list";
 import { $createCodeNode, $isCodeNode } from "@lexical/code";
 import { INSERT_HORIZONTAL_RULE_COMMAND } from "@lexical/react/LexicalHorizontalRuleNode";
 import { TOGGLE_LINK_COMMAND, $isLinkNode } from "@lexical/link";
 import { INSERT_TABLE_COMMAND } from "@lexical/table";
 import { $getNearestNodeOfType } from "@lexical/utils";
 import {
-  Bold, Italic, Underline, Code, LinkIcon, List, ListOrdered, Quote, Heading1, Heading2, Heading3, Undo, Redo, AlignLeft, AlignCenter, AlignRight, Minus, Plus, Table, ImageIcon, ListChecks, Highlighter, Subscript, Superscript, Strikethrough
+  Bold,
+  Italic,
+  Underline,
+  Code,
+  LinkIcon,
+  List,
+  ListOrdered,
+  Quote,
+  Heading1,
+  Heading2,
+  Heading3,
+  Undo,
+  Redo,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  Minus,
+  Plus,
+  Table,
+  ImageIcon,
+  ListChecks,
+  Highlighter,
+  Subscript,
+  Superscript,
+  Strikethrough,
+  FileDown,
+  FileUp,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
-import { useToolbarState } from "@/lib/editor/hooks/useToolbarState";
-import { LinkDialog, TableDialog, ImageDialog } from "@/components/editor/dialogs";
-import { ColorPicker } from "./ColorPicker";
-import { HIGHLIGHT_COLORS, smoothTransition } from "@/lib/editor/constants";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import { useToolbarState } from "@/lib/editor/hooks/use-toolbar-state";
+import {
+  LinkDialog,
+  TableDialog,
+  ImageDialog,
+} from "@/components/editor/dialogs";
+import { ColorPicker } from "./color-picker";
+import { ANIMATION_CONFIG } from "@/lib/editor/constants";
 import { $createImageNode } from "@/lib/editor/nodes/ImageNode";
 import { $patchStyleText } from "@lexical/selection";
+import { HIGHLIGHT_COLORS } from "@/lib/editor/colors";
+import {
+  copyAsPlainText,
+  exportAsHTML,
+  exportAsMarkdown,
+} from "@/lib/editor/export";
+import { importMarkdown } from "@/lib/editor/import";
 
 export function Toolbar() {
   const [editor] = useLexicalComposerContext();
@@ -43,6 +97,14 @@ export function Toolbar() {
   const [showLinkDialog, setShowLinkDialog] = useState(false);
   const [showTableDialog, setShowTableDialog] = useState(false);
   const [showImageDialog, setShowImageDialog] = useState(false);
+  const importInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      importMarkdown(editor, file);
+    }
+  };
 
   const updateToolbar = useCallback(() => {
     let newToolbarState = {};
@@ -72,13 +134,16 @@ export function Toolbar() {
         }
 
         let isLink = false;
-        let node = anchorNode;
+        let node:
+          | import("lexical").ElementNode
+          | import("lexical").TextNode
+          | null = anchorNode;
         while (node) {
           if ($isLinkNode(node)) {
             isLink = true;
             break;
           }
-          const parent = node.getParent();
+          const parent: import("lexical").ElementNode | null = node.getParent();
           if (parent === node) break;
           node = parent;
         }
@@ -188,7 +253,7 @@ export function Toolbar() {
       className="flex items-center gap-1 p-3 border-b bg-gradient-to-r from-background via-background to-accent/5 backdrop-blur-sm flex-wrap"
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={smoothTransition}
+      transition={ANIMATION_CONFIG.smooth}
     >
       <motion.div whileTap={{ scale: 0.95 }}>
         <Button
@@ -572,6 +637,63 @@ export function Toolbar() {
         onClose={() => setShowImageDialog(false)}
         onSubmit={handleImageSubmit}
       />
+
+      <div className="w-px h-6 bg-gradient-to-b from-transparent via-border to-transparent mx-2" />
+
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <motion.div whileTap={{ scale: 0.95 }}>
+            <Button
+              variant="ghost"
+              size="sm"
+              title="Export"
+              className="hover:bg-accent/80 transition-colors"
+            >
+              <FileDown className="size-4" />
+            </Button>
+          </motion.div>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          align="start"
+          className="animate-in slide-in-from-top-2 duration-200"
+        >
+          <DropdownMenuItem
+            onClick={() => exportAsHTML(editor)}
+            className="hover:bg-accent/80 transition-colors"
+          >
+            Save as HTML
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => exportAsMarkdown(editor)}
+            className="hover:bg-accent/80 transition-colors"
+          >
+            Save as Markdown
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => copyAsPlainText(editor)}
+            className="hover:bg-accent/80 transition-colors"
+          >
+            Copy as Plain Text
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <input
+        type="file"
+        accept=".md,.markdown"
+        ref={importInputRef}
+        onChange={handleImport}
+        className="hidden"
+      />
+      <Button
+        variant="ghost"
+        size="sm"
+        title="Import"
+        onClick={() => importInputRef.current?.click()}
+        className="hover:bg-accent/80 transition-colors"
+      >
+        <FileUp className="size-4" />
+      </Button>
     </motion.div>
   );
 }

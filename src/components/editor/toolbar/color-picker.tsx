@@ -1,7 +1,15 @@
 import { useState, useCallback, useEffect } from "react";
 import type { LexicalEditor } from "lexical";
-import { $getSelection, $isRangeSelection, SELECTION_CHANGE_COMMAND, COMMAND_PRIORITY_CRITICAL } from "lexical";
-import { $getSelectionStyleValueForProperty, $patchStyleText } from "@lexical/selection";
+import {
+  $getSelection,
+  $isRangeSelection,
+  SELECTION_CHANGE_COMMAND,
+  COMMAND_PRIORITY_CRITICAL,
+} from "lexical";
+import {
+  $getSelectionStyleValueForProperty,
+  $patchStyleText,
+} from "@lexical/selection";
 import { Palette } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -11,7 +19,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { FONT_COLORS } from "@/lib/editor/constants";
+import { FONT_COLORS } from "@/lib/editor/colors";
 
 export function ColorPicker({
   editor,

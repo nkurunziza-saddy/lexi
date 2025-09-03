@@ -1,16 +1,9 @@
-import { useState, useCallback, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { $getSelection, $isRangeSelection, FORMAT_TEXT_COMMAND, SELECTION_CHANGE_COMMAND, COMMAND_PRIORITY_LOW } from "lexical";
-import { mergeRegister } from "@lexical/utils";
-import {
-  Bold,
-  Italic,
-  Underline,
-  Code,
-  Highlighter,
-} from "lucide-react";
+import { $getSelection, $isRangeSelection, FORMAT_TEXT_COMMAND } from "lexical";
+import { $patchStyleText } from "@lexical/selection";
+import { Bold, Italic, Underline, Code, Highlighter } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -20,88 +13,13 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { HIGHLIGHT_COLORS, springTransition } from "@/lib/editor/constants";
-import { $patchStyleText } from "@lexical/selection";
+import { ANIMATION_CONFIG } from "@/lib/editor/constants";
+import { HIGHLIGHT_COLORS } from "@/lib/editor/colors";
+import { useFloatingToolbar } from "@/lib/editor/hooks/use-floating-toolbar";
 
 export function FloatingToolbar() {
   const [editor] = useLexicalComposerContext();
-  const toolbarRef = useRef<HTMLDivElement>(null);
-  const [activeFormats, setActiveFormats] = useState<Set<string>>(new Set());
-  const [isVisible, setIsVisible] = useState(false);
-  const [position, setPosition] = useState({ top: "-1000px", left: "-1000px" });
-
-  const updateToolbar = useCallback(() => {
-    editor.read(() => {
-      const selection = $getSelection();
-
-      if (
-        $isRangeSelection(selection) &&
-        !selection.isCollapsed() &&
-        selection.getTextContent() !== ""
-      ) {
-        const nativeSelection = window.getSelection();
-        if (!nativeSelection || nativeSelection.rangeCount === 0) {
-          setIsVisible(false);
-          return;
-        }
-        const domRange = nativeSelection.getRangeAt(0);
-        const rect = domRange.getBoundingClientRect();
-
-        setPosition({
-          top: `${rect.top + window.pageYOffset - 60}px`,
-          left: `${rect.left + window.pageXOffset + rect.width / 2}px`,
-        });
-        setIsVisible(true);
-
-        const formats = new Set<string>();
-        if (selection.hasFormat("bold")) formats.add("bold");
-        if (selection.hasFormat("italic")) formats.add("italic");
-        if (selection.hasFormat("underline")) formats.add("underline");
-        if (selection.hasFormat("code")) formats.add("code");
-        setActiveFormats(formats);
-      } else {
-        setIsVisible(false);
-      }
-    });
-  }, [editor]);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const editorRoot = editor.getRootElement();
-      if (
-        isVisible &&
-        toolbarRef.current &&
-        !toolbarRef.current.contains(event.target as Node) &&
-        !editorRoot?.contains(event.target as Node)
-      ) {
-        setIsVisible(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [editor, isVisible]);
-
-  useEffect(() => {
-    return mergeRegister(
-      editor.registerUpdateListener(({ editorState }) => {
-        editorState.read(() => {
-          updateToolbar();
-        });
-      }),
-      editor.registerCommand(
-        SELECTION_CHANGE_COMMAND,
-        () => {
-          editor.read(() => {
-            updateToolbar();
-          });
-          return false;
-        },
-        COMMAND_PRIORITY_LOW
-      )
-    );
-  }, [editor, updateToolbar]);
+  const { toolbarRef, isVisible, position, activeFormats } = useFloatingToolbar();
 
   return createPortal(
     <AnimatePresence>
@@ -116,7 +34,7 @@ export function FloatingToolbar() {
           initial={{ opacity: 0, y: 10, scale: 0.9 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 10, scale: 0.9 }}
-          transition={springTransition}
+          transition={ANIMATION_CONFIG.spring}
           onMouseDown={(e) => e.preventDefault()}
         >
           {[

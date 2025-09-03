@@ -40,7 +40,20 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  
+  --editor-background: var(--editor-background);
+  --editor-foreground: var(--editor-foreground);
+  --editor-primary: var(--editor-primary);
+  --editor-primary-foreground: var(--editor-primary-foreground);
+  --editor-accent: var(--editor-accent);
+  --editor-accent-foreground: var(--editor-accent-foreground);
+  --editor-popover: var(--editor-popover);
+  --editor-popover-foreground: var(--editor-popover-foreground);
+  --editor-border: var(--editor-border);
+  --editor-ring: var(--editor-ring);
+  --editor-muted: var(--editor-muted);
+  --editor-muted-foreground: var(--editor-muted-foreground);
+  --editor-card: var(--editor-card);
+  --editor-card-foreground: var(--editor-card-foreground);
 }
 
 :root {
@@ -77,7 +90,20 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
 
-  
+  --editor-background: oklch(1 0 0);
+  --editor-foreground: oklch(0.145 0 0);
+  --editor-card: oklch(1 0 0);
+  --editor-card-foreground: oklch(0.145 0 0);
+  --editor-popover: oklch(1 0 0);
+  --editor-popover-foreground: oklch(0.145 0 0);
+  --editor-primary: oklch(0.205 0 0);
+  --editor-primary-foreground: oklch(0.985 0 0);
+  --editor-muted: oklch(0.97 0 0);
+  --editor-muted-foreground: oklch(0.556 0 0);
+  --editor-accent: oklch(0.97 0 0);
+  --editor-accent-foreground: oklch(0.205 0 0);
+  --editor-border: oklch(0.922 0 0);
+  --editor-ring: oklch(0.708 0 0);
 }
 
 .dark {
@@ -113,7 +139,20 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
 
-  
+  --editor-background: oklch(0.145 0 0);
+  --editor-foreground: oklch(0.985 0 0);
+  --editor-card: oklch(0.205 0 0);
+  --editor-card-foreground: oklch(0.985 0 0);
+  --editor-popover: oklch(0.205 0 0);
+  --editor-popover-foreground: oklch(0.985 0 0);
+  --editor-primary: oklch(0.922 0 0);
+  --editor-primary-foreground: oklch(0.205 0 0);
+  --editor-muted: oklch(0.269 0 0);
+  --editor-muted-foreground: oklch(0.708 0 0);
+  --editor-accent: oklch(0.269 0 0);
+  --editor-accent-foreground: oklch(0.985 0 0);
+  --editor-border: oklch(1 0 0 / 10%);
+  --editor-ring: oklch(0.556 0 0);
 }
 
 @layer base {
