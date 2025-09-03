@@ -1,0 +1,34 @@
+/* Editor specific theme variables */
+:root {
+  --editor-background: var(--background);
+  --editor-foreground: var(--foreground);
+  --editor-primary: var(--primary);
+  --editor-primary-foreground: var(--primary-foreground);
+  --editor-accent: var(--accent);
+  --editor-accent-foreground: var(--accent-foreground);
+  --editor-popover: var(--popover);
+  --editor-popover-foreground: var(--popover-foreground);
+  --editor-border: var(--border);
+  --editor-ring: var(--ring);
+  --editor-muted: var(--muted);
+  --editor-muted-foreground: var(--muted-foreground);
+  --editor-card: var(--card);
+  --editor-card-foreground: var(--card-foreground);
+}
+
+.dark {
+  --editor-background: var(--background);
+  --editor-foreground: var(--foreground);
+  --editor-primary: var(--primary);
+  --editor-primary-foreground: var(--primary-foreground);
+  --editor-accent: var(--accent);
+  --editor-accent-foreground: var(--accent-foreground);
+  --editor-popover: var(--popover);
+  --editor-popover-foreground: var(--popover-foreground);
+  --editor-border: var(--border);
+  --editor-ring: var(--ring);
+  --editor-muted: var(--muted);
+  --editor-muted-foreground: var(--muted-foreground);
+  --editor-card: var(--card);
+  --editor-card-foreground: var(--card-foreground);
+}
