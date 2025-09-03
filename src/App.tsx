@@ -1,12 +1,9 @@
-import React, {
-  type JSX,
-  useState,
-  useCallback,
-  useEffect,
-  useRef,
-  useMemo,
-} from "react";
+"use client";
+
+import type React from "react";
+import { type JSX, useState, useCallback, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
+import { motion, AnimatePresence, cubicBezier } from "motion/react";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
@@ -39,7 +36,6 @@ import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
 // Lexical commands and utilities
 import {
   type LexicalEditor,
-  type RangeSelection,
   $getSelection,
   $isRangeSelection,
   FORMAT_TEXT_COMMAND,
@@ -51,10 +47,7 @@ import {
   REDO_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
   COMMAND_PRIORITY_LOW,
-  $createParagraphNode,
-  $createTextNode,
   DecoratorNode,
-  KEY_ESCAPE_COMMAND,
   type SerializedLexicalNode,
 } from "lexical";
 import {
@@ -85,11 +78,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -102,7 +90,7 @@ import {
   Italic,
   Underline,
   Code,
-  Link as LinkIcon,
+  LinkIcon,
   List,
   ListOrdered,
   Quote,
@@ -114,39 +102,51 @@ import {
   AlignLeft,
   AlignCenter,
   AlignRight,
-  ChevronDown,
   Minus,
   Plus,
-  Type,
   Table,
-  Image,
+  ImageIcon,
   ListChecks,
   Highlighter,
   Subscript,
   Superscript,
   Upload,
   Palette,
+  Strikethrough,
 } from "lucide-react";
 
-// Highlight colors
+// Premium animation configurations
+const springTransition = {
+  type: "spring" as const,
+  stiffness: 400,
+  damping: 30,
+};
+
+const smoothTransition = {
+  duration: 0.2,
+  ease: cubicBezier(0.4, 0, 0.2, 1),
+};
+
+// Highlight colors with premium palette
 const HIGHLIGHT_COLORS = [
-  { name: "Yellow", value: "#fff59d" },
-  { name: "Green", value: "#c8e6c9" },
-  { name: "Blue", value: "#bbdefb" },
-  { name: "Pink", value: "#f8bbd9" },
-  { name: "Orange", value: "#ffcc80" },
+  { name: "Golden", value: "rgba(255, 235, 59, 0.3)" },
+  { name: "Emerald", value: "rgba(16, 185, 129, 0.3)" },
+  { name: "Sky", value: "rgba(14, 165, 233, 0.3)" },
+  { name: "Rose", value: "rgba(244, 63, 94, 0.3)" },
+  { name: "Violet", value: "rgba(139, 92, 246, 0.3)" },
+  { name: "Amber", value: "rgba(245, 158, 11, 0.3)" },
 ];
 
 const FONT_COLORS = [
-  { name: "Default", value: "#000000" },
-  { name: "Gray", value: "#888888" },
-  { name: "Brown", value: "#A35200" },
-  { name: "Orange", value: "#FF7C00" },
-  { name: "Yellow", value: "#FFC800" },
-  { name: "Green", value: "#00A352" },
-  { name: "Blue", value: "#0084FF" },
-  { name: "Purple", value: "#8400FF" },
-  { name: "Red", value: "#FF0000" },
+  { name: "Default", value: "hsl(var(--foreground))" },
+  { name: "Muted", value: "hsl(var(--muted-foreground))" },
+  { name: "Slate", value: "#64748b" },
+  { name: "Amber", value: "#f59e0b" },
+  { name: "Emerald", value: "#10b981" },
+  { name: "Blue", value: "#3b82f6" },
+  { name: "Purple", value: "#8b5cf6" },
+  { name: "Rose", value: "#f43f5a" },
+  { name: "Indigo", value: "#6366f1" },
 ];
 
 // Custom Image Node
@@ -183,7 +183,7 @@ class ImageNode extends DecoratorNode<JSX.Element> {
     } as ImageNodeSerialized;
   }
 
-  constructor(src: string, alt: string = "Image", key?: string) {
+  constructor(src: string, alt = "Image", key?: string) {
     super(key);
     this.__src = src;
     this.__alt = alt;
@@ -201,11 +201,18 @@ class ImageNode extends DecoratorNode<JSX.Element> {
 
   decorate(): JSX.Element {
     return (
-      <img
-        src={this.__src}
-        alt={this.__alt}
-        className="max-w-full h-auto rounded-md my-4"
-      />
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={springTransition}
+        className="my-4"
+      >
+        <img
+          src={this.__src || "/placeholder.svg"}
+          alt={this.__alt}
+          className="max-w-full h-auto rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300"
+        />
+      </motion.div>
     );
   }
 }
@@ -214,116 +221,36 @@ function $createImageNode(src: string, alt?: string): ImageNode {
   return new ImageNode(src, alt);
 }
 
-function FloatingLinkEditor() {
-  const [editor] = useLexicalComposerContext();
-  const [linkUrl, setLinkUrl] = useState("");
-  const [isLink, setIsLink] = useState(false);
-  const [lastSelection, setLastSelection] = useState<RangeSelection | null>(
-    null
-  );
-  const popoverRef = useRef<HTMLDivElement>(null);
-
-  const update = useCallback(() => {
-    editor.read(() => {
-      const selection = $getSelection();
-      if ($isRangeSelection(selection)) {
-        const node = selection.anchor.getNode();
-        const parent = node.getParent();
-        if ($isLinkNode(parent)) {
-          setLinkUrl(parent.getURL());
-          setIsLink(true);
-        } else if ($isLinkNode(node)) {
-          setLinkUrl(node.getURL());
-          setIsLink(true);
-        } else {
-          setIsLink(false);
-        }
-        setLastSelection(selection.clone());
-      }
-    });
-  }, [editor]);
-
-  useEffect(() => {
-    return editor.registerUpdateListener(({ editorState }) => {
-      editorState.read(() => {
-        update();
-      });
-    });
-  }, [editor, update]);
-
-  const handleEdit = () => {
-    if (isLink && lastSelection) {
-      editor.dispatchCommand(TOGGLE_LINK_COMMAND, linkUrl);
-    }
-  };
-
-  if (!isLink || !lastSelection) {
-    return null;
-  }
-
-  return createPortal(
-    <div ref={popoverRef} className="fixed z-50">
-      <Popover open={isLink}>
-        <PopoverTrigger asChild>
-          <div
-            style={{
-              position: "absolute",
-              ...editor
-                .getElementByKey(lastSelection.anchor.key)
-                ?.getBoundingClientRect(),
-            }}
-          />
-        </PopoverTrigger>
-        <PopoverContent className="w-80 flex items-center gap-2">
-          <Input value={linkUrl} onChange={(e) => setLinkUrl(e.target.value)} />
-          <Button onClick={handleEdit} size="sm">
-            Save
-          </Button>
-          <Button
-            onClick={() => editor.dispatchCommand(TOGGLE_LINK_COMMAND, null)}
-            size="sm"
-            variant="destructive"
-          >
-            Remove
-          </Button>
-        </PopoverContent>
-      </Popover>
-    </div>,
-    document.body
-  );
-}
-
-// Fixed floating toolbar that only shows on text selection
+// Enhanced floating toolbar with premium animations
 function FloatingToolbar() {
   const [editor] = useLexicalComposerContext();
   const toolbarRef = useRef<HTMLDivElement>(null);
   const [activeFormats, setActiveFormats] = useState<Set<string>>(new Set());
+  const [isVisible, setIsVisible] = useState(false);
+  const [position, setPosition] = useState({ top: "-1000px", left: "-1000px" });
 
   const updateToolbar = useCallback(() => {
     editor.read(() => {
       const selection = $getSelection();
-      const toolbar = toolbarRef.current;
 
       if (
         $isRangeSelection(selection) &&
         !selection.isCollapsed() &&
-        selection.getTextContent() !== "" &&
-        toolbar
+        selection.getTextContent() !== ""
       ) {
         const nativeSelection = window.getSelection();
         if (!nativeSelection || nativeSelection.rangeCount === 0) {
-          toolbar.style.opacity = "0";
-          toolbar.style.top = "-1000px";
+          setIsVisible(false);
           return;
         }
         const domRange = nativeSelection.getRangeAt(0);
         const rect = domRange.getBoundingClientRect();
 
-        toolbar.style.opacity = "1";
-        toolbar.style.top = `${rect.top + window.pageYOffset - 60}px`;
-        toolbar.style.left = `${
-          rect.left + window.pageXOffset + rect.width / 2
-        }px`;
+        setPosition({
+          top: `${rect.top + window.pageYOffset - 60}px`,
+          left: `${rect.left + window.pageXOffset + rect.width / 2}px`,
+        });
+        setIsVisible(true);
 
         // Update format buttons
         const formats = new Set<string>();
@@ -332,31 +259,29 @@ function FloatingToolbar() {
         if (selection.hasFormat("underline")) formats.add("underline");
         if (selection.hasFormat("code")) formats.add("code");
         setActiveFormats(formats);
-      } else if (toolbar) {
-        toolbar.style.opacity = "0";
-        toolbar.style.top = "-1000px";
+      } else {
+        setIsVisible(false);
       }
     });
   }, [editor]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      const toolbar = toolbarRef.current;
       const editorRoot = editor.getRootElement();
       if (
-        toolbar &&
-        !toolbar.contains(event.target as Node) &&
+        isVisible &&
+        toolbarRef.current &&
+        !toolbarRef.current.contains(event.target as Node) &&
         !editorRoot?.contains(event.target as Node)
       ) {
-        toolbar.style.opacity = "0";
-        toolbar.style.top = "-1000px";
+        setIsVisible(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [editor]);
+  }, [editor, isVisible]);
 
   useEffect(() => {
     return mergeRegister(
@@ -379,96 +304,106 @@ function FloatingToolbar() {
   }, [editor, updateToolbar]);
 
   return createPortal(
-    <div
-      ref={toolbarRef}
-      className="fixed z-50 flex items-center gap-1 p-2 bg-popover border rounded-md shadow-md transition-opacity duration-200"
-      style={{
-        opacity: 0,
-        top: "-1000px",
-        transform: "translateX(-50%)",
-      }}
-      onMouseDown={(e) => e.preventDefault()} // Prevent editor from losing focus
-    >
-      <Button
-        variant={activeFormats.has("bold") ? "secondary" : "ghost"}
-        size="sm"
-        onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold")}
-      >
-        <Bold className="w-4 h-4" />
-      </Button>
-      <Button
-        variant={activeFormats.has("italic") ? "secondary" : "ghost"}
-        size="sm"
-        onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic")}
-      >
-        <Italic className="w-4 h-4" />
-      </Button>
-      <Button
-        variant={activeFormats.has("underline") ? "secondary" : "ghost"}
-        size="sm"
-        onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "underline")}
-      >
-        <Underline className="w-4 h-4" />
-      </Button>
-
-      {/* Highlight dropdown */}
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="sm">
-            <Highlighter className="w-4 h-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          {HIGHLIGHT_COLORS.map((color) => (
-            <DropdownMenuItem
-              key={color.value}
-              onClick={() => {
-                editor.update(() => {
-                  const selection = $getSelection();
-                  if ($isRangeSelection(selection)) {
-                    $patchStyleText(selection, {
-                      "background-color": color.value,
-                    });
-                  }
-                });
-              }}
-            >
-              <div
-                className="w-4 h-4 rounded mr-2 border"
-                style={{ backgroundColor: color.value }}
-              />
-              {color.name}
-            </DropdownMenuItem>
-          ))}
-          <DropdownMenuSeparator />
-          <DropdownMenuItem
-            onClick={() => {
-              editor.update(() => {
-                const selection = $getSelection();
-                if ($isRangeSelection(selection)) {
-                  $patchStyleText(selection, { "background-color": "" });
+    <AnimatePresence>
+      {isVisible && (
+        <motion.div
+          ref={toolbarRef}
+          className="fixed z-50 flex items-center gap-1 p-2 bg-background/95 backdrop-blur-md border border-border/50 rounded-lg shadow-2xl"
+          style={{
+            ...position,
+            transform: "translateX(-50%)",
+          }}
+          initial={{ opacity: 0, y: 10, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 10, scale: 0.9 }}
+          transition={springTransition}
+          onMouseDown={(e) => e.preventDefault()}
+        >
+          {[
+            { key: "bold", icon: Bold, format: "bold" },
+            { key: "italic", icon: Italic, format: "italic" },
+            { key: "underline", icon: Underline, format: "underline" },
+            { key: "code", icon: Code, format: "code" },
+          ].map(({ key, icon: Icon, format }) => (
+            <motion.div key={key} whileTap={{ scale: 0.95 }}>
+              <Button
+                variant={activeFormats.has(format) ? "secondary" : "ghost"}
+                size="sm"
+                onClick={() =>
+                  editor.dispatchCommand(
+                    FORMAT_TEXT_COMMAND,
+                    format as
+                      | "subscript"
+                      | "superscript"
+                      | "bold"
+                      | "italic"
+                      | "underline"
+                      | "code"
+                      | "strikethrough"
+                  )
                 }
-              });
-            }}
-          >
-            Remove Highlight
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+                className="size-8 p-0 hover:bg-accent/80 transition-colors"
+              >
+                <Icon className="size-4" />
+              </Button>
+            </motion.div>
+          ))}
 
-      <Button
-        variant={activeFormats.has("code") ? "secondary" : "ghost"}
-        size="sm"
-        onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "code")}
-      >
-        <Code className="w-4 h-4" />
-      </Button>
-    </div>,
+          {/* Highlight dropdown with enhanced animation */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <motion.div whileTap={{ scale: 0.95 }}>
+                <Button variant="ghost" size="sm" className="size-8 p-0">
+                  <Highlighter className="size-4" />
+                </Button>
+              </motion.div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="animate-in slide-in-from-top-2 duration-200 grid grid-cols-3 gap-1">
+              {HIGHLIGHT_COLORS.map((color) => (
+                <DropdownMenuItem
+                  key={color.value}
+                  onClick={() => {
+                    editor.update(() => {
+                      const selection = $getSelection();
+                      if ($isRangeSelection(selection)) {
+                        $patchStyleText(selection, {
+                          "background-color": color.value,
+                        });
+                      }
+                    });
+                  }}
+                  className=""
+                >
+                  <div
+                    className="size-4 rounded-sm border border-input/20 shadow-sm"
+                    style={{ backgroundColor: color.value }}
+                  />
+                  {color.name}
+                </DropdownMenuItem>
+              ))}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => {
+                  editor.update(() => {
+                    const selection = $getSelection();
+                    if ($isRangeSelection(selection)) {
+                      $patchStyleText(selection, { "background-color": "" });
+                    }
+                  });
+                }}
+              >
+                Remove Highlight
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </motion.div>
+      )}
+    </AnimatePresence>,
     document.body
   );
 }
 
-// Fixed Link Dialog
+// Enhanced Link Dialog with premium styling
 function LinkDialog({
   isOpen,
   onClose,
@@ -497,35 +432,56 @@ function LinkDialog({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Insert Link</DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="url">URL</Label>
-            <Input
-              id="url"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              placeholder="https://example.com"
-              autoFocus
-            />
-          </div>
-          <div className="flex gap-2 justify-end">
-            <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button type="submit">Insert Link</Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+    <AnimatePresence>
+      {isOpen && (
+        <Dialog open={isOpen} onOpenChange={onClose}>
+          <DialogContent className="sm:max-w-md backdrop-blur-md bg-background/95">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={springTransition}
+            >
+              <DialogHeader>
+                <DialogTitle className="text-xl font-semibold">
+                  Insert Link
+                </DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+                <div>
+                  <Label htmlFor="url" className="text-sm font-medium">
+                    URL
+                  </Label>
+                  <Input
+                    id="url"
+                    value={url}
+                    onChange={(e) => setUrl(e.target.value)}
+                    placeholder="https://example.com"
+                    autoFocus
+                    className="mt-1.5 focus:ring-2 focus:ring-primary/20 transition-all"
+                  />
+                </div>
+                <div className="flex gap-2 justify-end">
+                  <Button type="button" variant="outline" onClick={onClose}>
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    className="bg-primary hover:bg-primary/90"
+                  >
+                    Insert Link
+                  </Button>
+                </div>
+              </form>
+            </motion.div>
+          </DialogContent>
+        </Dialog>
+      )}
+    </AnimatePresence>
   );
 }
 
-// Table Insert Dialog
+// Enhanced Table Dialog
 function TableDialog({
   isOpen,
   onClose,
@@ -545,51 +501,81 @@ function TableDialog({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Insert Table</DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="rows">Rows</Label>
-            <Input
-              id="rows"
-              type="number"
-              min="1"
-              max="20"
-              value={rows}
-              onChange={(e) =>
-                setRows(Math.max(1, parseInt(e.target.value) || 1))
-              }
-            />
-          </div>
-          <div>
-            <Label htmlFor="columns">Columns</Label>
-            <Input
-              id="columns"
-              type="number"
-              min="1"
-              max="20"
-              value={columns}
-              onChange={(e) =>
-                setColumns(Math.max(1, parseInt(e.target.value) || 1))
-              }
-            />
-          </div>
-          <div className="flex gap-2 justify-end">
-            <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button type="submit">Insert Table</Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+    <AnimatePresence>
+      {isOpen && (
+        <Dialog open={isOpen} onOpenChange={onClose}>
+          <DialogContent className="sm:max-w-md backdrop-blur-md bg-background/95">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={springTransition}
+            >
+              <DialogHeader>
+                <DialogTitle className="text-xl font-semibold">
+                  Insert Table
+                </DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="rows" className="text-sm font-medium">
+                      Rows
+                    </Label>
+                    <Input
+                      id="rows"
+                      type="number"
+                      min="1"
+                      max="20"
+                      value={rows}
+                      onChange={(e) =>
+                        setRows(
+                          Math.max(1, Number.parseInt(e.target.value) || 1)
+                        )
+                      }
+                      className="mt-1.5"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="columns" className="text-sm font-medium">
+                      Columns
+                    </Label>
+                    <Input
+                      id="columns"
+                      type="number"
+                      min="1"
+                      max="20"
+                      value={columns}
+                      onChange={(e) =>
+                        setColumns(
+                          Math.max(1, Number.parseInt(e.target.value) || 1)
+                        )
+                      }
+                      className="mt-1.5"
+                    />
+                  </div>
+                </div>
+                <div className="flex gap-2 justify-end">
+                  <Button type="button" variant="outline" onClick={onClose}>
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    className="bg-primary hover:bg-primary/90"
+                  >
+                    Insert Table
+                  </Button>
+                </div>
+              </form>
+            </motion.div>
+          </DialogContent>
+        </Dialog>
+      )}
+    </AnimatePresence>
   );
 }
 
-// Image Upload Dialog
+// Enhanced Image Dialog
 function ImageDialog({
   isOpen,
   onClose,
@@ -631,79 +617,111 @@ function ImageDialog({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Insert Image</DialogTitle>
-        </DialogHeader>
-        <div className="space-y-4">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <Label htmlFor="image-url">Image URL</Label>
-              <Input
-                id="image-url"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                placeholder="https://example.com/image.jpg"
-              />
-            </div>
-            <div>
-              <Label htmlFor="image-alt">Alt Text (optional)</Label>
-              <Input
-                id="image-alt"
-                value={alt}
-                onChange={(e) => setAlt(e.target.value)}
-                placeholder="Describe the image"
-              />
-            </div>
-            <div className="flex gap-2 justify-end">
-              <Button type="button" variant="outline" onClick={onClose}>
-                Cancel
-              </Button>
-              <Button type="submit" disabled={!url.trim()}>
-                Insert Image
-              </Button>
-            </div>
-          </form>
-
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">
-                Or
-              </span>
-            </div>
-          </div>
-
-          <div>
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleFileChange}
-              accept="image/*"
-              className="hidden"
-            />
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full"
-              onClick={() => fileInputRef.current?.click()}
+    <AnimatePresence>
+      {isOpen && (
+        <Dialog open={isOpen} onOpenChange={onClose}>
+          <DialogContent className="sm:max-w-md backdrop-blur-md bg-background/95">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={springTransition}
             >
-              <Upload className="w-4 h-4 mr-2" />
-              Upload from Computer
-            </Button>
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
+              <DialogHeader>
+                <DialogTitle className="text-xl font-semibold">
+                  Insert Image
+                </DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 mt-4">
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div>
+                    <Label htmlFor="image-url" className="text-sm font-medium">
+                      Image URL
+                    </Label>
+                    <Input
+                      id="image-url"
+                      value={url}
+                      onChange={(e) => setUrl(e.target.value)}
+                      placeholder="https://example.com/image.jpg"
+                      className="mt-1.5"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="image-alt" className="text-sm font-medium">
+                      Alt Text (optional)
+                    </Label>
+                    <Input
+                      id="image-alt"
+                      value={alt}
+                      onChange={(e) => setAlt(e.target.value)}
+                      placeholder="Describe the image"
+                      className="mt-1.5"
+                    />
+                  </div>
+                  <div className="flex gap-2 justify-end">
+                    <Button type="button" variant="outline" onClick={onClose}>
+                      Cancel
+                    </Button>
+                    <Button
+                      type="submit"
+                      disabled={!url.trim()}
+                      className="bg-primary hover:bg-primary/90"
+                    >
+                      Insert Image
+                    </Button>
+                  </div>
+                </form>
+
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t border-border/60" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-background px-2 text-muted-foreground font-medium">
+                      Or
+                    </span>
+                  </div>
+                </div>
+
+                <div>
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full hover:bg-accent/80 transition-colors bg-transparent"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <Upload className="size-4 mr-2" />
+                    Upload from Computer
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          </DialogContent>
+        </Dialog>
+      )}
+    </AnimatePresence>
   );
 }
 
 // Toolbar state hook
 function useToolbarState() {
   const [toolbarState, setToolbarState] = useState({
+    isHeading1: false,
+    isHeading2: false,
+    isHeading3: false,
+    isBulletedList: false,
+    isNumberedList: false,
+    isCheckList: false,
+    isQuote: false,
+    isCodeBlock: false,
+    isStrikethrough: false,
     isBold: false,
     isItalic: false,
     isUnderline: false,
@@ -715,167 +733,9 @@ function useToolbarState() {
     blockType: "paragraph",
     canUndo: false,
     canRedo: false,
-    fontColor: "#000000",
   });
 
   return { toolbarState, setToolbarState };
-}
-
-// Block format dropdown
-function BlockFormatDropDown({
-  editor,
-  blockType,
-  disabled = false,
-}: {
-  editor: LexicalEditor;
-  blockType: string;
-  disabled?: boolean;
-}) {
-  const formatParagraph = () => {
-    editor.update(() => {
-      const selection = $getSelection();
-      if ($isRangeSelection(selection)) {
-        $setBlocksType(selection, () => $createParagraphNode());
-      }
-    });
-  };
-
-  const formatHeading = (headingSize: "h1" | "h2" | "h3") => {
-    editor.update(() => {
-      const selection = $getSelection();
-      if ($isRangeSelection(selection)) {
-        $setBlocksType(selection, () => $createHeadingNode(headingSize));
-      }
-    });
-  };
-
-  const formatQuote = () => {
-    editor.update(() => {
-      const selection = $getSelection();
-      if ($isRangeSelection(selection)) {
-        $setBlocksType(selection, () => $createQuoteNode());
-      }
-    });
-  };
-
-  const formatCodeBlock = () => {
-    editor.update(() => {
-      const selection = $getSelection();
-      if ($isRangeSelection(selection)) {
-        $setBlocksType(selection, () => $createCodeNode());
-      }
-    });
-  };
-
-  const getBlockIcon = () => {
-    switch (blockType) {
-      case "h1":
-        return <Heading1 className="w-4 h-4" />;
-      case "h2":
-        return <Heading2 className="w-4 h-4" />;
-      case "h3":
-        return <Heading3 className="w-4 h-4" />;
-      case "bullet":
-        return <List className="w-4 h-4" />;
-      case "number":
-        return <ListOrdered className="w-4 h-4" />;
-      case "check":
-        return <ListChecks className="w-4 h-4" />;
-      case "quote":
-        return <Quote className="w-4 h-4" />;
-      case "code":
-        return <Code className="w-4 h-4" />;
-      default:
-        return <Type className="w-4 h-4" />;
-    }
-  };
-
-  const getBlockName = () => {
-    switch (blockType) {
-      case "h1":
-        return "Heading 1";
-      case "h2":
-        return "Heading 2";
-      case "h3":
-        return "Heading 3";
-      case "bullet":
-        return "Bullet List";
-      case "number":
-        return "Numbered List";
-      case "check":
-        return "Check List";
-      case "quote":
-        return "Quote";
-      case "code":
-        return "Code Block";
-      default:
-        return "Normal";
-    }
-  };
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="h-9 px-3" disabled={disabled}>
-          {getBlockIcon()}
-          <span className="ml-2 text-sm">{getBlockName()}</span>
-          <ChevronDown className="ml-1 w-4 h-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-48">
-        <DropdownMenuItem onClick={formatParagraph}>
-          <Type className="mr-2 w-4 h-4" />
-          Normal
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => formatHeading("h1")}>
-          <Heading1 className="mr-2 w-4 h-4" />
-          Heading 1
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => formatHeading("h2")}>
-          <Heading2 className="mr-2 w-4 h-4" />
-          Heading 2
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => formatHeading("h3")}>
-          <Heading3 className="mr-2 w-4 h-4" />
-          Heading 3
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem
-          onClick={() =>
-            editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined)
-          }
-        >
-          <List className="mr-2 w-4 h-4" />
-          Bullet List
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() =>
-            editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined)
-          }
-        >
-          <ListOrdered className="mr-2 w-4 h-4" />
-          Numbered List
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() =>
-            editor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, undefined)
-          }
-        >
-          <ListChecks className="mr-2 w-4 h-4" />
-          Checklist
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={formatQuote}>
-          <Quote className="mr-2 w-4 h-4" />
-          Quote
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={formatCodeBlock}>
-          <Code className="mr-2 w-4 h-4" />
-          Code Block
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
 }
 
 function ColorPicker({
@@ -885,7 +745,7 @@ function ColorPicker({
   editor: LexicalEditor;
   disabled?: boolean;
 }) {
-  const [color, setColor] = useState("#000000");
+  const [color, setColor] = useState("hsl(var(--foreground))");
 
   const applyColor = useCallback(
     (newColor: string) => {
@@ -907,7 +767,11 @@ function ColorPicker({
           const selection = $getSelection();
           if ($isRangeSelection(selection)) {
             setColor(
-              $getSelectionStyleValueForProperty(selection, "color", "#000000")
+              $getSelectionStyleValueForProperty(
+                selection,
+                "color",
+                "hsl(var(--foreground))"
+              )
             );
           }
         });
@@ -920,15 +784,19 @@ function ColorPicker({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" disabled={disabled}>
-          <Palette className="w-4 h-4" style={{ color }} />
+        <Button variant="ghost" size="sm" disabled={disabled} className="">
+          <Palette className="size-4" style={{ color }} />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent>
+      <DropdownMenuContent className="animate-in grid grid-cols-3 gap-1 slide-in-from-top-2 duration-200">
         {FONT_COLORS.map((c) => (
-          <DropdownMenuItem key={c.name} onClick={() => applyColor(c.value)}>
+          <DropdownMenuItem
+            key={c.name}
+            className=""
+            onClick={() => applyColor(c.value)}
+          >
             <div
-              className="w-4 h-4 rounded-full mr-2 border"
+              className="size-4 rounded-sm border border-input/20 shadow-sm"
               style={{ backgroundColor: c.value }}
             />
             {c.name}
@@ -939,7 +807,7 @@ function ColorPicker({
   );
 }
 
-// Main toolbar component
+// Main toolbar component with enhanced animations
 function ToolbarPlugin() {
   const [editor] = useLexicalComposerContext();
   const { toolbarState, setToolbarState } = useToolbarState();
@@ -994,6 +862,15 @@ function ToolbarPlugin() {
 
         newToolbarState = {
           blockType: blockType,
+          isHeading1: blockType === "h1",
+          isHeading2: blockType === "h2",
+          isHeading3: blockType === "h3",
+          isBulletedList: blockType === "bullet",
+          isNumberedList: blockType === "numbered",
+          isCheckList: blockType === "check",
+          isQuote: blockType === "quote",
+          isCodeBlock: blockType === "code",
+          isStrikethrough: selection.hasFormat("strikethrough"),
           isBold: selection.hasFormat("bold"),
           isItalic: selection.hasFormat("italic"),
           isUnderline: selection.hasFormat("underline"),
@@ -1005,7 +882,7 @@ function ToolbarPlugin() {
           fontColor: $getSelectionStyleValueForProperty(
             selection,
             "color",
-            "#000000"
+            "hsl(var(--foreground))"
           ),
         };
       }
@@ -1083,95 +960,238 @@ function ToolbarPlugin() {
   };
 
   return (
-    <div className="flex items-center gap-1 p-2 border-b bg-card flex-wrap">
-      {/* Undo/Redo */}
-      <Button
-        variant="ghost"
-        size="sm"
-        disabled={!toolbarState.canUndo}
-        onClick={() => editor.dispatchCommand(UNDO_COMMAND, undefined)}
-        title="Undo"
-      >
-        <Undo className="w-4 h-4" />
-      </Button>
-      <Button
-        variant="ghost"
-        size="sm"
-        disabled={!toolbarState.canRedo}
-        onClick={() => editor.dispatchCommand(REDO_COMMAND, undefined)}
-        title="Redo"
-      >
-        <Redo className="w-4 h-4" />
-      </Button>
+    <motion.div
+      layout
+      className="flex items-center gap-1 p-3 border-b bg-gradient-to-r from-background via-background to-accent/5 backdrop-blur-sm flex-wrap"
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={smoothTransition}
+    >
+      {/* Undo/Redo with enhanced animations */}
+      <motion.div whileTap={{ scale: 0.95 }}>
+        <Button
+          variant="ghost"
+          size="sm"
+          disabled={!toolbarState.canUndo}
+          onClick={() => editor.dispatchCommand(UNDO_COMMAND, undefined)}
+          title="Undo"
+          className="hover:bg-accent/80 transition-all duration-200"
+        >
+          <Undo className="size-4" />
+        </Button>
+      </motion.div>
+      <motion.div whileTap={{ scale: 0.95 }}>
+        <Button
+          variant="ghost"
+          size="sm"
+          disabled={!toolbarState.canRedo}
+          onClick={() => editor.dispatchCommand(REDO_COMMAND, undefined)}
+          title="Redo"
+          className="hover:bg-accent/80 transition-all duration-200"
+        >
+          <Redo className="size-4" />
+        </Button>
+      </motion.div>
 
-      <div className="w-px h-6 bg-border mx-2" />
+      <div className="w-px h-6 bg-gradient-to-b from-transparent via-border to-transparent mx-2" />
 
-      {/* Block Format */}
-      <BlockFormatDropDown editor={editor} blockType={toolbarState.blockType} />
+      {/* Inline Block Format */}
 
-      <div className="w-px h-6 bg-border mx-2" />
+      <div className="w-px h-6 bg-gradient-to-b from-transparent via-border to-transparent mx-2" />
 
-      {/* Text Format */}
-      <Button
-        variant={toolbarState.isBold ? "secondary" : "ghost"}
-        size="sm"
-        onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold")}
-      >
-        <Bold className="w-4 h-4" />
-      </Button>
-      <Button
-        variant={toolbarState.isItalic ? "secondary" : "ghost"}
-        size="sm"
-        onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic")}
-      >
-        <Italic className="w-4 h-4" />
-      </Button>
-      <Button
-        variant={toolbarState.isUnderline ? "secondary" : "ghost"}
-        size="sm"
-        onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "underline")}
-      >
-        <Underline className="w-4 h-4" />
-      </Button>
-      <Button
-        variant={toolbarState.isCode ? "secondary" : "ghost"}
-        size="sm"
-        onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "code")}
-      >
-        <Code className="w-4 h-4" />
-      </Button>
-      <Button
-        variant={toolbarState.isSubscript ? "secondary" : "ghost"}
-        size="sm"
-        onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "subscript")}
-      >
-        <Subscript className="w-4 h-4" />
-      </Button>
-      <Button
-        variant={toolbarState.isSuperscript ? "secondary" : "ghost"}
-        size="sm"
-        onClick={() =>
-          editor.dispatchCommand(FORMAT_TEXT_COMMAND, "superscript")
-        }
-        title="Superscript"
-      >
-        <Superscript className="w-4 h-4" />
-      </Button>
+      {[
+        {
+          key: "h1",
+          icon: Heading1,
+          format: "h1",
+          state: toolbarState.blockType === "h1",
+        },
+        {
+          key: "h2",
+          icon: Heading2,
+          format: "h2",
+          state: toolbarState.blockType === "h2",
+        },
+        {
+          key: "h3",
+          icon: Heading3,
+          format: "h3",
+          state: toolbarState.blockType === "h3",
+        },
+      ].map(({ key, icon: Icon, format, state }) => (
+        <motion.div key={key} whileTap={{ scale: 0.95 }}>
+          <Button
+            variant={state ? "secondary" : "ghost"}
+            size="sm"
+            onClick={() =>
+              editor.update(() => {
+                const selection = $getSelection();
+                if ($isRangeSelection(selection)) {
+                  $setBlocksType(selection, () =>
+                    $createHeadingNode(format as "h1" | "h2" | "h3")
+                  );
+                }
+              })
+            }
+            className="hover:bg-accent/80 transition-all duration-200"
+          >
+            <Icon className="size-4" />
+          </Button>
+        </motion.div>
+      ))}
+
+      <div className="w-px h-6 bg-gradient-to-b from-transparent via-border to-transparent mx-2" />
+
+      <motion.div whileTap={{ scale: 0.95 }}>
+        <Button
+          variant={toolbarState.isBulletedList ? "secondary" : "ghost"}
+          size="sm"
+          onClick={() =>
+            editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined)
+          }
+          className="hover:bg-accent/80 transition-all duration-200"
+        >
+          <List className="size-4" />
+        </Button>
+      </motion.div>
+      <motion.div whileTap={{ scale: 0.95 }}>
+        <Button
+          variant={toolbarState.isNumberedList ? "secondary" : "ghost"}
+          size="sm"
+          onClick={() =>
+            editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined)
+          }
+          className="hover:bg-accent/80 transition-all duration-200"
+        >
+          <ListOrdered className="size-4" />
+        </Button>
+      </motion.div>
+      <div className="w-px h-6 bg-gradient-to-b from-transparent via-border to-transparent mx-2" />
+      <motion.div whileTap={{ scale: 0.95 }}>
+        <Button
+          variant={toolbarState.isCheckList ? "secondary" : "ghost"}
+          size="sm"
+          onClick={() =>
+            editor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, undefined)
+          }
+          className="hover:bg-accent/80 transition-all duration-200"
+        >
+          <ListChecks className="size-4" />
+        </Button>
+      </motion.div>
+      <motion.div whileTap={{ scale: 0.95 }}>
+        <Button
+          variant={toolbarState.isQuote ? "secondary" : "ghost"}
+          size="sm"
+          onClick={() =>
+            editor.update(() => {
+              const selection = $getSelection();
+              if ($isRangeSelection(selection)) {
+                $setBlocksType(selection, () => $createQuoteNode());
+              }
+            })
+          }
+          className="hover:bg-accent/80 transition-all duration-200"
+        >
+          <Quote className="size-4" />
+        </Button>
+      </motion.div>
+      <motion.div whileTap={{ scale: 0.95 }}>
+        <Button
+          variant={toolbarState.isCode ? "secondary" : "ghost"}
+          size="sm"
+          onClick={() =>
+            editor.update(() => {
+              const selection = $getSelection();
+              if ($isRangeSelection(selection)) {
+                $setBlocksType(selection, () => $createCodeNode());
+              }
+            })
+          }
+          className="hover:bg-accent/80 transition-all duration-200"
+        >
+          <Code className="size-4" />
+        </Button>
+      </motion.div>
+
+      <div className="w-px h-6 bg-gradient-to-b from-transparent via-border to-transparent mx-2" />
+
+      {/* Text Format with enhanced button styling */}
+      {[
+        { key: "bold", icon: Bold, format: "bold", state: toolbarState.isBold },
+        {
+          key: "italic",
+          icon: Italic,
+          format: "italic",
+          state: toolbarState.isItalic,
+        },
+        {
+          key: "underline",
+          icon: Underline,
+          format: "underline",
+          state: toolbarState.isUnderline,
+        },
+        {
+          key: "strikethrough",
+          icon: Strikethrough,
+          format: "strikethrough",
+          state: toolbarState.isStrikethrough,
+        },
+        { key: "code", icon: Code, format: "code", state: toolbarState.isCode },
+        {
+          key: "subscript",
+          icon: Subscript,
+          format: "subscript",
+          state: toolbarState.isSubscript,
+        },
+        {
+          key: "superscript",
+          icon: Superscript,
+          format: "superscript",
+          state: toolbarState.isSuperscript,
+        },
+      ].map(({ key, icon: Icon, format, state }) => (
+        <motion.div key={key} whileTap={{ scale: 0.95 }}>
+          <Button
+            variant={state ? "secondary" : "ghost"}
+            size="sm"
+            onClick={() =>
+              editor.dispatchCommand(
+                FORMAT_TEXT_COMMAND,
+                format as
+                  | "subscript"
+                  | "superscript"
+                  | "bold"
+                  | "italic"
+                  | "underline"
+                  | "code"
+                  | "strikethrough"
+              )
+            }
+            className="hover:bg-accent/80 transition-all duration-200"
+          >
+            <Icon className="size-4" />
+          </Button>
+        </motion.div>
+      ))}
 
       <ColorPicker editor={editor} />
 
       {/* Highlight dropdown */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button
-            variant={toolbarState.isHighlight ? "secondary" : "ghost"}
-            size="sm"
-            title="Highlight"
-          >
-            <Highlighter className="w-4 h-4" />
-          </Button>
+          <motion.div whileTap={{ scale: 0.95 }}>
+            <Button
+              variant={toolbarState.isHighlight ? "secondary" : "ghost"}
+              size="sm"
+              title="Highlight"
+              className="hover:bg-accent/80 transition-all duration-200"
+            >
+              <Highlighter className="size-4" />
+            </Button>
+          </motion.div>
         </DropdownMenuTrigger>
-        <DropdownMenuContent>
+        <DropdownMenuContent className="animate-in slide-in-from-top-2 duration-200">
           {HIGHLIGHT_COLORS.map((color) => (
             <DropdownMenuItem
               key={color.value}
@@ -1185,9 +1205,10 @@ function ToolbarPlugin() {
                   }
                 });
               }}
+              className="hover:bg-accent/80 transition-colors"
             >
               <div
-                className="w-4 h-4 rounded mr-2 border"
+                className="size-4 rounded-sm mr-2 border shadow-sm"
                 style={{ backgroundColor: color.value }}
               />
               {color.name}
@@ -1203,82 +1224,116 @@ function ToolbarPlugin() {
                 }
               });
             }}
+            className="hover:bg-accent/80 transition-colors"
           >
             Remove Highlight
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <Button
-        variant={toolbarState.isLink ? "secondary" : "ghost"}
-        size="sm"
-        onClick={insertLink}
-        title="Insert Link"
-      >
-        <LinkIcon className="w-4 h-4" />
-      </Button>
+      <motion.div whileTap={{ scale: 0.95 }}>
+        <Button
+          variant={toolbarState.isLink ? "secondary" : "ghost"}
+          size="sm"
+          onClick={insertLink}
+          title="Insert Link"
+          className="hover:bg-accent/80 transition-all duration-200"
+        >
+          <LinkIcon className="size-4" />
+        </Button>
+      </motion.div>
 
-      <div className="w-px h-6 bg-border mx-2" />
+      <div className="w-px h-6 bg-gradient-to-b from-transparent via-border to-transparent mx-2" />
 
       {/* Insert Menu */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="sm" title="Insert">
-            <Plus className="w-4 h-4" />
-          </Button>
+          <motion.div whileTap={{ scale: 0.95 }}>
+            <Button
+              variant="ghost"
+              size="sm"
+              title="Insert"
+              className="hover:bg-accent/80 transition-colors"
+            >
+              <Plus className="size-4" />
+            </Button>
+          </motion.div>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start">
+        <DropdownMenuContent
+          align="start"
+          className="animate-in slide-in-from-top-2 duration-200"
+        >
           <DropdownMenuItem
             onClick={() =>
               editor.dispatchCommand(INSERT_HORIZONTAL_RULE_COMMAND, undefined)
             }
+            className="hover:bg-accent/80 transition-colors"
           >
-            <Minus className="mr-2 w-4 h-4" />
+            <Minus className="mr-2 size-4" />
             Divider
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setShowTableDialog(true)}>
-            <Table className="mr-2 w-4 h-4" />
+          <DropdownMenuItem
+            onClick={() => setShowTableDialog(true)}
+            className="hover:bg-accent/80 transition-colors"
+          >
+            <Table className="mr-2 size-4" />
             Table
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setShowImageDialog(true)}>
-            <Image className="mr-2 w-4 h-4" />
+          <DropdownMenuItem
+            onClick={() => setShowImageDialog(true)}
+            className="hover:bg-accent/80 transition-colors"
+          >
+            <ImageIcon className="mr-2 size-4" />
             Image
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <div className="w-px h-6 bg-border mx-2" />
+      <div className="w-px h-6 bg-gradient-to-b from-transparent via-border to-transparent mx-2" />
 
       {/* Alignment */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="sm" title="Text Alignment">
-            <AlignLeft className="w-4 h-4" />
-          </Button>
+          <motion.div whileTap={{ scale: 0.95 }}>
+            <Button
+              variant="ghost"
+              size="sm"
+              title="Text Alignment"
+              className="hover:bg-accent/80 transition-colors"
+            >
+              <AlignLeft className="size-4" />
+            </Button>
+          </motion.div>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start">
+        <DropdownMenuContent
+          align="start"
+          className="animate-in slide-in-from-top-2 duration-200"
+        >
           <DropdownMenuItem
             onClick={() =>
               editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "left")
             }
+            className="hover:bg-accent/80 transition-colors"
           >
-            <AlignLeft className="mr-2 w-4 h-4" />
+            <AlignLeft className="mr-2 size-4" />
             Left
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() =>
               editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "center")
             }
+            className="hover:bg-accent/80 transition-colors"
           >
-            <AlignCenter className="mr-2 w-4 h-4" />
+            <AlignCenter className="mr-2 size-4" />
             Center
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() =>
               editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "right")
             }
+            className="hover:bg-accent/80 transition-colors"
           >
-            <AlignRight className="mr-2 w-4 h-4" />
+            <AlignRight className="mr-2 size-4" />
             Right
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -1302,53 +1357,54 @@ function ToolbarPlugin() {
         onClose={() => setShowImageDialog(false)}
         onSubmit={handleImageSubmit}
       />
-    </div>
+    </motion.div>
   );
 }
 
-// Theme configuration with improved checklist styling
+// Premium theme configuration with proper checklist support
 const theme = {
   ltr: "ltr",
   rtl: "rtl",
-  placeholder: "text-muted-foreground",
-  paragraph: "mb-2",
-  quote: "border-l-4 border-border pl-4 italic text-muted-foreground my-4",
+  placeholder: "text-muted-foreground/70",
+  paragraph: "mb-3 leading-relaxed",
+  quote:
+    "border-l-4 border-gradient-to-b from-primary/60 to-primary/20 pl-6 py-2 italic text-muted-foreground/90 my-6 bg-accent/20 rounded-r-lg",
   heading: {
-    h1: "text-3xl font-bold mb-4 mt-6",
-    h2: "text-2xl font-semibold mb-3 mt-5",
-    h3: "text-xl font-medium mb-2 mt-4",
+    h1: "text-4xl font-bold mb-6 mt-8 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent",
+    h2: "text-3xl font-semibold mb-4 mt-6 text-foreground/95",
+    h3: "text-2xl font-medium mb-3 mt-5 text-foreground/90",
   },
   list: {
     nested: {
       listitem: "list-none",
     },
-    ol: "list-decimal ml-4 mb-2",
-    ul: "list-disc ml-4 mb-2",
-    listitem: "mb-1",
-    checklist: "list-none ml-0 mb-2",
+    ol: "list-decimal ml-6 mb-4 space-y-1",
+    ul: "list-disc ml-6 mb-4 space-y-1",
+    listitem: "mb-2 leading-relaxed",
+    checklist: "list-none ml-0 mb-4 space-y-2",
     listitemChecked:
-      "flex items-center gap-2 mb-1 text-muted-foreground line-through",
-    listitemUnchecked: "flex items-center gap-2 mb-1",
-    listitemCheckboxChecked:
-      "w-4 h-4 bg-muted border-2 border-border rounded-sm",
-    listitemCheckboxUnchecked: "w-4 h-4 border-2 border-border rounded-sm",
+      "flex items-start gap-3 mb-2 text-muted-foreground/70 line-through transition-all duration-200",
+    listitemUnchecked:
+      "flex items-start gap-3 mb-2 transition-all duration-200",
   },
   text: {
-    bold: "font-semibold",
+    bold: "font-semibold text-foreground",
     italic: "italic",
-    underline: "underline",
-    code: "bg-muted px-1 py-0.5 rounded text-sm font-mono",
-    highlight: "bg-yellow-200 dark:bg-yellow-800",
+    underline: "underline decoration-2 underline-offset-2",
+    code: "bg-accent/80 px-2 py-1 rounded-md text-sm font-mono border shadow-sm",
+    highlight: "px-1 py-0.5 rounded-sm",
     subscript: "text-xs align-sub",
     superscript: "text-xs align-super",
   },
-  code: "bg-muted p-4 rounded-lg font-mono text-sm my-4 overflow-x-auto block",
-  link: "text-primary underline hover:no-underline cursor-pointer",
-  table: "border-collapse table-auto w-full my-4 border border-border",
-  tableCell: "border border-border px-4 py-2 min-w-[100px]",
+  code: "bg-accent/60 p-4 rounded-xl font-mono text-sm my-6 overflow-x-auto block border shadow-sm backdrop-blur-sm",
+  link: "text-primary hover:text-primary/80 underline decoration-primary/30 hover:decoration-primary/60 underline-offset-2 transition-all duration-200 cursor-pointer",
+  table:
+    "border-collapse table-auto w-full my-6 border border-border/60 rounded-lg overflow-hidden shadow-sm",
+  tableCell:
+    "border border-border/40 px-4 py-3 min-w-[100px] transition-colors hover:bg-accent/20",
   tableCellHeader:
-    "border border-border px-4 py-2 bg-muted font-semibold min-w-[100px]",
-  hr: "my-4 border-t border-border",
+    "border border-border/40 px-4 py-3 bg-accent/60 font-semibold min-w-[100px] backdrop-blur-sm",
+  hr: "my-8 border-t border-gradient-to-r from-transparent via-border to-transparent",
 };
 
 // Essential nodes including new ones
@@ -1374,32 +1430,48 @@ function onError(error: Error) {
 
 export default function App() {
   const initialConfig = {
-    namespace: "ImprovedEditor",
+    namespace: "PremiumEditor",
     theme,
     onError,
     nodes,
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto p-4">
+    <motion.div
+      className="w-full"
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+    >
       <LexicalComposer initialConfig={initialConfig}>
-        <div className="bg-card rounded-lg border shadow-sm overflow-hidden">
+        <motion.div
+          className="relative"
+          initial={{ scale: 0.98 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+        >
           <ToolbarPlugin />
-          <div className="relative">
+          <div className="relative max-w-6xl mx-auto my-6">
             <RichTextPlugin
               contentEditable={
                 <ContentEditable
-                  className="p-6 outline-none prose prose-sm max-w-none transition-all"
+                  className="p-8 outline-none prose prose-lg max-w-none transition-all duration-300"
                   style={{
-                    minHeight: "500px",
+                    minHeight: "600px",
                     caretColor: "hsl(var(--primary))",
+                    lineHeight: "1.7",
                   }}
                 />
               }
               placeholder={
-                <div className="absolute top-6 left-6 text-muted-foreground pointer-events-none select-none">
-                  Start typing here... or type "/" for commands.
-                </div>
+                <motion.div
+                  className="absolute top-8 left-8 text-muted-foreground/60 pointer-events-none select-none text-lg"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: 0.5 }}
+                >
+                  Start writing your masterpiece...
+                </motion.div>
               }
               ErrorBoundary={LexicalErrorBoundary}
             />
@@ -1412,10 +1484,9 @@ export default function App() {
             <HorizontalRulePlugin />
             <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
             <FloatingToolbar />
-            <FloatingLinkEditor />
           </div>
-        </div>
+        </motion.div>
       </LexicalComposer>
-    </div>
+    </motion.div>
   );
 }
