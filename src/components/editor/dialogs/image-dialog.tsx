@@ -12,7 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ANIMATION_CONFIG } from "@/lib/editor/constants";
+import { ANIMATION_CONFIG } from "@/lib/editor/configs";
 
 export function ImageDialog({
   isOpen,

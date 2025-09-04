@@ -1,8 +1,8 @@
-.EditorTheme__paragraph {
+.PlaygroundEditorTheme__paragraph {
   margin: 0;
   position: relative;
 }
-.EditorTheme__quote {
+.PlaygroundEditorTheme__quote {
   margin: 0;
   margin-left: 20px;
   margin-bottom: 10px;
@@ -13,58 +13,58 @@
   border-left-style: solid;
   padding-left: 16px;
 }
-.EditorTheme__h1 {
+.PlaygroundEditorTheme__h1 {
   font-size: 24px;
   color: rgb(5, 5, 5);
   font-weight: 400;
   margin: 0;
 }
-.EditorTheme__h2 {
+.PlaygroundEditorTheme__h2 {
   font-size: 15px;
   color: rgb(101, 103, 107);
   font-weight: 700;
   margin: 0;
   text-transform: uppercase;
 }
-.EditorTheme__h3 {
+.PlaygroundEditorTheme__h3 {
   font-size: 12px;
   margin: 0;
   text-transform: uppercase;
 }
-.EditorTheme__indent {
+.PlaygroundEditorTheme__indent {
   --lexical-indent-base-value: 40px;
 }
-.EditorTheme__textBold {
+.PlaygroundEditorTheme__textBold {
   font-weight: bold;
 }
-.EditorTheme__paragraph mark {
+.PlaygroundEditorTheme__paragraph mark {
   background-color: unset;
 }
-.EditorTheme__textHighlight {
+.PlaygroundEditorTheme__textHighlight {
   background: rgba(255, 212, 0, 0.14);
   border-bottom: 2px solid rgba(255, 212, 0, 0.3);
 }
-.EditorTheme__textItalic {
+.PlaygroundEditorTheme__textItalic {
   font-style: italic;
 }
-.EditorTheme__textUnderline {
+.PlaygroundEditorTheme__textUnderline {
   text-decoration: underline;
 }
 
-.EditorTheme__textStrikethrough {
+.PlaygroundEditorTheme__textStrikethrough {
   text-decoration: line-through;
 }
 
-.EditorTheme__textUnderlineStrikethrough {
+.PlaygroundEditorTheme__textUnderlineStrikethrough {
   text-decoration: underline line-through;
 }
 
-.EditorTheme__tabNode {
+.PlaygroundEditorTheme__tabNode {
   position: relative;
   text-decoration: none;
 }
 
-.EditorTheme__tabNode.EditorTheme__textUnderline::after {
+.PlaygroundEditorTheme__tabNode.PlaygroundEditorTheme__textUnderline::after {
   content: "";
   position: absolute;
   left: 0;
@@ -73,7 +73,7 @@
   border-bottom: 0.1em solid currentColor;
 }
 
-.EditorTheme__tabNode.EditorTheme__textStrikethrough::before {
+.PlaygroundEditorTheme__tabNode.PlaygroundEditorTheme__textStrikethrough::before {
   content: "";
   position: absolute;
   left: 0;
@@ -82,65 +82,65 @@
   border-top: 0.1em solid currentColor;
 }
 
-.EditorTheme__tabNode.EditorTheme__textUnderlineStrikethrough::before,
-.EditorTheme__tabNode.EditorTheme__textUnderlineStrikethrough::after {
+.PlaygroundEditorTheme__tabNode.PlaygroundEditorTheme__textUnderlineStrikethrough::before,
+.PlaygroundEditorTheme__tabNode.PlaygroundEditorTheme__textUnderlineStrikethrough::after {
   content: "";
   position: absolute;
   left: 0;
   right: 0;
 }
 
-.EditorTheme__tabNode.EditorTheme__textUnderlineStrikethrough::before {
+.PlaygroundEditorTheme__tabNode.PlaygroundEditorTheme__textUnderlineStrikethrough::before {
   top: 0.69em;
   border-top: 0.1em solid currentColor;
 }
 
-.EditorTheme__tabNode.EditorTheme__textUnderlineStrikethrough::after {
+.PlaygroundEditorTheme__tabNode.PlaygroundEditorTheme__textUnderlineStrikethrough::after {
   bottom: 0.05em;
   border-bottom: 0.1em solid currentColor;
 }
 
-.EditorTheme__textSubscript {
+.PlaygroundEditorTheme__textSubscript {
   font-size: 0.8em;
   vertical-align: sub !important;
 }
-.EditorTheme__textSuperscript {
+.PlaygroundEditorTheme__textSuperscript {
   font-size: 0.8em;
   vertical-align: super;
 }
-.EditorTheme__textCode {
+.PlaygroundEditorTheme__textCode {
   background-color: rgb(240, 242, 245);
   padding: 1px 0.25rem;
   font-family: Menlo, Consolas, Monaco, monospace;
   font-size: 94%;
 }
-.EditorTheme__textLowercase {
+.PlaygroundEditorTheme__textLowercase {
   text-transform: lowercase;
 }
-.EditorTheme__textUppercase {
+.PlaygroundEditorTheme__textUppercase {
   text-transform: uppercase;
 }
-.EditorTheme__textCapitalize {
+.PlaygroundEditorTheme__textCapitalize {
   text-transform: capitalize;
 }
-.EditorTheme__hashtag {
+.PlaygroundEditorTheme__hashtag {
   background-color: rgba(88, 144, 255, 0.15);
   border-bottom: 1px solid rgba(88, 144, 255, 0.3);
 }
-.EditorTheme__link {
+.PlaygroundEditorTheme__link {
   color: rgb(33, 111, 219);
   text-decoration: none;
 }
-.EditorTheme__link:hover {
+.PlaygroundEditorTheme__link:hover {
   text-decoration: underline;
   cursor: pointer;
 }
-.EditorTheme__blockCursor {
+.PlaygroundEditorTheme__blockCursor {
   display: block;
   pointer-events: none;
   position: absolute;
 }
-.EditorTheme__blockCursor:after {
+.PlaygroundEditorTheme__blockCursor:after {
   content: "";
   display: block;
   position: absolute;
@@ -154,7 +154,7 @@
     visibility: hidden;
   }
 }
-.EditorTheme__code {
+.PlaygroundEditorTheme__code {
   background-color: rgb(240, 242, 245);
   font-family: Menlo, Consolas, Monaco, monospace;
   display: block;
@@ -168,7 +168,7 @@
   position: relative;
   tab-size: 2;
 }
-.EditorTheme__code:before {
+.PlaygroundEditorTheme__code:before {
   content: attr(data-gutter);
   position: absolute;
   background-color: #eee;
@@ -181,23 +181,23 @@
   text-align: right;
   min-width: 25px;
 }
-.EditorTheme__tableScrollableWrapper {
+.PlaygroundEditorTheme__tableScrollableWrapper {
   overflow-x: auto;
   margin: 0px 25px 30px 0px;
 }
-.EditorTheme__tableScrollableWrapper > .EditorTheme__table {
+.PlaygroundEditorTheme__tableScrollableWrapper > .PlaygroundEditorTheme__table {
   /* Remove the table's vertical margin and put it on the wrapper */
   margin-top: 0;
   margin-bottom: 0;
 }
-.EditorTheme__tableAlignmentCenter {
+.PlaygroundEditorTheme__tableAlignmentCenter {
   margin-left: auto;
   margin-right: auto;
 }
-.EditorTheme__tableAlignmentRight {
+.PlaygroundEditorTheme__tableAlignmentRight {
   margin-left: auto;
 }
-.EditorTheme__table {
+.PlaygroundEditorTheme__table {
   border-collapse: collapse;
   border-spacing: 0;
   overflow-y: scroll;
@@ -207,27 +207,27 @@
   margin-top: 25px;
   margin-bottom: 30px;
 }
-.EditorTheme__tableScrollableWrapper.EditorTheme__tableFrozenRow {
+.PlaygroundEditorTheme__tableScrollableWrapper.PlaygroundEditorTheme__tableFrozenRow {
   /* position:sticky needs overflow:clip or visible
      https://github.com/w3c/csswg-drafts/issues/865#issuecomment-350585274 */
   overflow-x: clip;
 }
-.EditorTheme__tableFrozenRow tr:nth-of-type(1) > td {
+.PlaygroundEditorTheme__tableFrozenRow tr:nth-of-type(1) > td {
   overflow: clip;
   background-color: #ffffff;
   position: sticky;
   z-index: 2;
   top: 44px;
 }
-.EditorTheme__tableFrozenRow tr:nth-of-type(1) > th {
+.PlaygroundEditorTheme__tableFrozenRow tr:nth-of-type(1) > th {
   overflow: clip;
   background-color: #f2f3f5;
   position: sticky;
   z-index: 2;
   top: 44px;
 }
-.EditorTheme__tableFrozenRow tr:nth-of-type(1) > th:after,
-.EditorTheme__tableFrozenRow tr:nth-of-type(1) > td:after {
+.PlaygroundEditorTheme__tableFrozenRow tr:nth-of-type(1) > th:after,
+.PlaygroundEditorTheme__tableFrozenRow tr:nth-of-type(1) > td:after {
   content: "";
   position: absolute;
   left: 0;
@@ -235,19 +235,19 @@
   width: 100%;
   border-bottom: 1px solid #bbb;
 }
-.EditorTheme__tableFrozenColumn tr > td:first-child {
+.PlaygroundEditorTheme__tableFrozenColumn tr > td:first-child {
   background-color: #ffffff;
   position: sticky;
   z-index: 2;
   left: 0;
 }
-.EditorTheme__tableFrozenColumn tr > th:first-child {
+.PlaygroundEditorTheme__tableFrozenColumn tr > th:first-child {
   background-color: #f2f3f5;
   position: sticky;
   z-index: 2;
   left: 0;
 }
-.EditorTheme__tableFrozenColumn tr > :first-child::after {
+.PlaygroundEditorTheme__tableFrozenColumn tr > :first-child::after {
   content: "";
   position: absolute;
   left: 0;
@@ -256,20 +256,20 @@
   height: 100%;
   border-right: 1px solid #bbb;
 }
-.EditorTheme__tableRowStriping tr:nth-child(even),
-.EditorTheme__tableFrozenColumn
-  .EditorTheme__table.EditorTheme__tableRowStriping
+.PlaygroundEditorTheme__tableRowStriping tr:nth-child(even),
+.PlaygroundEditorTheme__tableFrozenColumn
+  .PlaygroundEditorTheme__table.PlaygroundEditorTheme__tableRowStriping
   tr:nth-child(even)
   > td:first-child {
   background-color: #f2f5fb;
 }
-.EditorTheme__tableSelection *::selection {
+.PlaygroundEditorTheme__tableSelection *::selection {
   background-color: transparent;
 }
-.EditorTheme__tableSelected {
+.PlaygroundEditorTheme__tableSelected {
   outline: 2px solid rgb(60, 132, 244);
 }
-.EditorTheme__tableCell {
+.PlaygroundEditorTheme__tableCell {
   border: 1px solid #bbb;
   width: 75px;
   vertical-align: top;
@@ -283,10 +283,10 @@
   A firefox workaround to allow scrolling of overflowing table cell
   ref: https://bugzilla.mozilla.org/show_bug.cgi?id=1904159
 */
-.EditorTheme__tableCell > * {
+.PlaygroundEditorTheme__tableCell > * {
   overflow: inherit;
 }
-.EditorTheme__tableCellResizer {
+.PlaygroundEditorTheme__tableCellResizer {
   position: absolute;
   right: -4px;
   height: 100%;
@@ -295,14 +295,14 @@
   z-index: 10;
   top: 0;
 }
-.EditorTheme__tableCellHeader {
+.PlaygroundEditorTheme__tableCellHeader {
   background-color: #f2f3f5;
   text-align: start;
 }
-.EditorTheme__tableCellSelected {
+.PlaygroundEditorTheme__tableCellSelected {
   caret-color: transparent;
 }
-.EditorTheme__tableCellSelected::after {
+.PlaygroundEditorTheme__tableCellSelected::after {
   position: absolute;
   left: 0;
   right: 0;
@@ -313,7 +313,7 @@
   content: "";
   pointer-events: none;
 }
-.EditorTheme__tableAddColumns {
+.PlaygroundEditorTheme__tableAddColumns {
   position: absolute;
   background-color: #eee;
   height: 100%;
@@ -321,7 +321,7 @@
   border: 0;
   cursor: pointer;
 }
-.EditorTheme__tableAddColumns:after {
+.PlaygroundEditorTheme__tableAddColumns:after {
   background-image: url(../images/icons/plus.svg);
   background-size: contain;
   background-position: center;
@@ -335,11 +335,11 @@
   height: 100%;
   opacity: 0.4;
 }
-.EditorTheme__tableAddColumns:hover,
-.EditorTheme__tableAddRows:hover {
+.PlaygroundEditorTheme__tableAddColumns:hover,
+.PlaygroundEditorTheme__tableAddRows:hover {
   background-color: #c9dbf0;
 }
-.EditorTheme__tableAddRows {
+.PlaygroundEditorTheme__tableAddRows {
   position: absolute;
   width: calc(100% - 25px);
   background-color: #eee;
@@ -347,7 +347,7 @@
   border: 0;
   cursor: pointer;
 }
-.EditorTheme__tableAddRows:after {
+.PlaygroundEditorTheme__tableAddRows:after {
   background-image: url(../images/icons/plus.svg);
   background-size: contain;
   background-position: center;
@@ -369,7 +369,7 @@
     opacity: 1;
   }
 }
-.EditorTheme__tableCellResizeRuler {
+.PlaygroundEditorTheme__tableCellResizeRuler {
   display: block;
   position: absolute;
   width: 1px;
@@ -377,7 +377,7 @@
   height: 100%;
   top: 0;
 }
-.EditorTheme__tableCellActionButtonContainer {
+.PlaygroundEditorTheme__tableCellActionButtonContainer {
   display: block;
   right: 5px;
   top: 6px;
@@ -386,7 +386,7 @@
   width: 20px;
   height: 20px;
 }
-.EditorTheme__tableCellActionButton {
+.PlaygroundEditorTheme__tableCellActionButton {
   background-color: #eee;
   display: block;
   border: 0;
@@ -396,61 +396,61 @@
   color: #222;
   cursor: pointer;
 }
-.EditorTheme__tableCellActionButton:hover {
+.PlaygroundEditorTheme__tableCellActionButton:hover {
   background-color: #ddd;
 }
-.EditorTheme__characterLimit {
+.PlaygroundEditorTheme__characterLimit {
   display: inline;
   background-color: #ffbbbb !important;
 }
-.EditorTheme__ol1 {
+.PlaygroundEditorTheme__ol1 {
   padding: 0;
   margin: 0;
   list-style-position: outside;
 }
-.EditorTheme__ol2 {
+.PlaygroundEditorTheme__ol2 {
   padding: 0;
   margin: 0;
   list-style-type: upper-alpha;
   list-style-position: outside;
 }
-.EditorTheme__ol3 {
+.PlaygroundEditorTheme__ol3 {
   padding: 0;
   margin: 0;
   list-style-type: lower-alpha;
   list-style-position: outside;
 }
-.EditorTheme__ol4 {
+.PlaygroundEditorTheme__ol4 {
   padding: 0;
   margin: 0;
   list-style-type: upper-roman;
   list-style-position: outside;
 }
-.EditorTheme__ol5 {
+.PlaygroundEditorTheme__ol5 {
   padding: 0;
   margin: 0;
   list-style-type: lower-roman;
   list-style-position: outside;
 }
-.EditorTheme__ul {
+.PlaygroundEditorTheme__ul {
   padding: 0;
   margin: 0;
   list-style-position: outside;
 }
-.EditorTheme__listItem {
+.PlaygroundEditorTheme__listItem {
   margin: 0 32px;
   font-family: var(--listitem-marker-font-family);
   font-size: var(--listitem-marker-font-size);
   background-color: var(--listitem-marker-background-color);
 }
-.EditorTheme__listItem::marker {
+.PlaygroundEditorTheme__listItem::marker {
   color: var(--listitem-marker-color);
   background-color: var(--listitem-marker-background-color);
   font-family: var(--listitem-marker-font-family);
   font-size: var(--listitem-marker-font-size);
 }
-.EditorTheme__listItemChecked,
-.EditorTheme__listItemUnchecked {
+.PlaygroundEditorTheme__listItemChecked,
+.PlaygroundEditorTheme__listItemUnchecked {
   position: relative;
   margin-left: 0.5em;
   margin-right: 0.5em;
@@ -461,12 +461,12 @@
   display: block;
   min-height: 1.5em;
 }
-.EditorTheme__listItemChecked > *,
-.EditorTheme__listItemUnchecked > * {
+.PlaygroundEditorTheme__listItemChecked > *,
+.PlaygroundEditorTheme__listItemUnchecked > * {
   margin-left: 0.01em;
 }
-.EditorTheme__listItemUnchecked:before,
-.EditorTheme__listItemChecked:before {
+.PlaygroundEditorTheme__listItemUnchecked:before,
+.PlaygroundEditorTheme__listItemChecked:before {
   content: "\200B";
   width: 0.9em;
   height: 0.9em;
@@ -478,25 +478,25 @@
   position: absolute;
   transform: translateY(-50%);
 }
-.EditorTheme__listItemChecked {
+.PlaygroundEditorTheme__listItemChecked {
   text-decoration: line-through;
 }
-.EditorTheme__listItemUnchecked:focus:before,
-.EditorTheme__listItemChecked:focus:before {
+.PlaygroundEditorTheme__listItemUnchecked:focus:before,
+.PlaygroundEditorTheme__listItemChecked:focus:before {
   box-shadow: 0 0 0 2px #a6cdfe;
   border-radius: 2px;
 }
-.EditorTheme__listItemUnchecked:before {
+.PlaygroundEditorTheme__listItemUnchecked:before {
   border: 1px solid #999;
   border-radius: 2px;
 }
-.EditorTheme__listItemChecked:before {
+.PlaygroundEditorTheme__listItemChecked:before {
   border: 1px solid rgb(61, 135, 245);
   border-radius: 2px;
   background-color: #3d87f5;
   background-repeat: no-repeat;
 }
-.EditorTheme__listItemChecked:after {
+.PlaygroundEditorTheme__listItemChecked:after {
   content: "";
   cursor: pointer;
   border-color: #fff;
@@ -510,127 +510,127 @@
   transform: translateY(-50%) rotate(45deg);
   border-width: 0 0.1em 0.1em 0;
 }
-.EditorTheme__nestedListItem {
+.PlaygroundEditorTheme__nestedListItem {
   list-style-type: none;
 }
-.EditorTheme__nestedListItem:before,
-.EditorTheme__nestedListItem:after {
+.PlaygroundEditorTheme__nestedListItem:before,
+.PlaygroundEditorTheme__nestedListItem:after {
   display: none;
 }
-.EditorTheme__tokenComment {
+.PlaygroundEditorTheme__tokenComment {
   color: slategray;
 }
-.EditorTheme__tokenDeleted {
+.PlaygroundEditorTheme__tokenDeleted {
   border-image: linear-gradient(to right, #ffcecb 50%, #ffebe9 50%) fill 0/0/0
     100vw;
 }
-.EditorTheme__tokenInserted {
+.PlaygroundEditorTheme__tokenInserted {
   border-image: linear-gradient(to right, #aceebb 50%, #dafbe1 50%) fill 0/0/0
     100vw;
 }
-.EditorTheme__tokenUnchanged {
+.PlaygroundEditorTheme__tokenUnchanged {
   border-image: linear-gradient(to right, #ddd 50%, #f0f2f5 50%) fill 0/0/0
     100vw;
 }
-.EditorTheme__tokenPunctuation {
+.PlaygroundEditorTheme__tokenPunctuation {
   color: #999;
 }
-.EditorTheme__tokenProperty {
+.PlaygroundEditorTheme__tokenProperty {
   color: #905;
 }
-.EditorTheme__tokenSelector {
+.PlaygroundEditorTheme__tokenSelector {
   color: #690;
 }
-.EditorTheme__tokenOperator {
+.PlaygroundEditorTheme__tokenOperator {
   color: #9a6e3a;
 }
-.EditorTheme__tokenAttr {
+.PlaygroundEditorTheme__tokenAttr {
   color: #07a;
 }
-.EditorTheme__tokenVariable {
+.PlaygroundEditorTheme__tokenVariable {
   color: #e90;
 }
-.EditorTheme__tokenFunction {
+.PlaygroundEditorTheme__tokenFunction {
   color: #dd4a68;
 }
-.EditorTheme__mark {
+.PlaygroundEditorTheme__mark {
   background: rgba(255, 212, 0, 0.14);
   border-bottom: 2px solid rgba(255, 212, 0, 0.3);
   padding-bottom: 2px;
 }
-.EditorTheme__markOverlap {
+.PlaygroundEditorTheme__markOverlap {
   background: rgba(255, 212, 0, 0.3);
   border-bottom: 2px solid rgba(255, 212, 0, 0.7);
 }
-.EditorTheme__mark.selected {
+.PlaygroundEditorTheme__mark.selected {
   background: rgba(255, 212, 0, 0.5);
   border-bottom: 2px solid rgba(255, 212, 0, 1);
 }
-.EditorTheme__markOverlap.selected {
+.PlaygroundEditorTheme__markOverlap.selected {
   background: rgba(255, 212, 0, 0.7);
   border-bottom: 2px solid rgba(255, 212, 0, 0.7);
 }
-.EditorTheme__embedBlock {
+.PlaygroundEditorTheme__embedBlock {
   user-select: none;
 }
-.EditorTheme__embedBlockFocus {
+.PlaygroundEditorTheme__embedBlockFocus {
   outline: 2px solid rgb(60, 132, 244);
 }
-.EditorTheme__layoutContainer {
+.PlaygroundEditorTheme__layoutContainer {
   display: grid;
   gap: 10px;
   margin: 10px 0;
 }
-.EditorTheme__layoutItem {
+.PlaygroundEditorTheme__layoutItem {
   border: 1px dashed #ddd;
   padding: 8px 16px;
   min-width: 0;
   max-width: 100%;
 }
-.EditorTheme__autocomplete {
+.PlaygroundEditorTheme__autocomplete {
   color: #ccc;
 }
-.EditorTheme__hr {
+.PlaygroundEditorTheme__hr {
   padding: 2px 2px;
   border: none;
   margin: 1em 0;
   cursor: pointer;
 }
-.EditorTheme__hr:after {
+.PlaygroundEditorTheme__hr:after {
   content: "";
   display: block;
   height: 2px;
   background-color: #ccc;
   line-height: 2px;
 }
-.EditorTheme__hr.EditorTheme__hrSelected {
+.PlaygroundEditorTheme__hr.PlaygroundEditorTheme__hrSelected {
   outline: 2px solid rgb(60, 132, 244);
   user-select: none;
 }
 
-.EditorTheme__specialText {
+.PlaygroundEditorTheme__specialText {
   background-color: yellow;
   font-weight: bold;
 }
 
-.EditorTheme__contextMenu {
+.PlaygroundEditorTheme__contextMenu {
   outline: 0;
   background: #fff;
   border: 1px solid #ddd;
   box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.3);
   border-radius: 8px;
 }
-.EditorTheme__contextMenu button:first-child {
+.PlaygroundEditorTheme__contextMenu button:first-child {
   border-radius: 8px 8px 0px 0px;
 }
-.EditorTheme__contextMenu button:last-child {
+.PlaygroundEditorTheme__contextMenu button:last-child {
   border-radius: 0px 0px 8px 8px;
 }
-.EditorTheme__contextMenuItem {
+.PlaygroundEditorTheme__contextMenuItem {
   width: 100%;
   display: block;
 }
-.EditorTheme__contextMenuItem {
+.PlaygroundEditorTheme__contextMenuItem {
   display: flex;
   justify-content: left;
   width: 100%;
@@ -646,19 +646,19 @@
   outline: 0;
   cursor: pointer;
 }
-.EditorTheme__contextMenuItem.open {
+.PlaygroundEditorTheme__contextMenuItem.open {
   background: #ddd;
 }
-.EditorTheme__contextMenuItem:focus,
-.EditorTheme__contextMenuItem:not([disabled]):active {
+.PlaygroundEditorTheme__contextMenuItem:focus,
+.PlaygroundEditorTheme__contextMenuItem:not([disabled]):active {
   background: #eee;
 }
-.EditorTheme__contextMenuItem:disabled {
+.PlaygroundEditorTheme__contextMenuItem:disabled {
   background: #fff;
   color: #aaa;
   cursor: not-allowed;
 }
-.EditorTheme__contextMenuItemIcon {
+.PlaygroundEditorTheme__contextMenuItemIcon {
   width: 20px;
   margin-right: 8px;
   background-repeat: no-repeat;

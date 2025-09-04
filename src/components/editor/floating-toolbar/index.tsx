@@ -13,13 +13,14 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { ANIMATION_CONFIG } from "@/lib/editor/constants";
+import { ANIMATION_CONFIG } from "@/lib/editor/configs";
 import { HIGHLIGHT_COLORS } from "@/lib/editor/colors";
 import { useFloatingToolbar } from "@/lib/editor/hooks/use-floating-toolbar";
 
 export function FloatingToolbar() {
   const [editor] = useLexicalComposerContext();
-  const { toolbarRef, isVisible, position, activeFormats } = useFloatingToolbar();
+  const { toolbarRef, isVisible, position, activeFormats } =
+    useFloatingToolbar();
 
   return createPortal(
     <AnimatePresence>

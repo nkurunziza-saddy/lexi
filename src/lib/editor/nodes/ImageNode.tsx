@@ -3,7 +3,7 @@ import { DecoratorNode } from "lexical";
 import { motion } from "motion/react";
 
 import type { ImageNodeSerialized } from "@/types/editor";
-import { ANIMATION_CONFIG } from "../constants";
+import { ANIMATION_CONFIG } from "../configs";
 
 export class ImageNode extends DecoratorNode<JSX.Element> {
   __src: string;

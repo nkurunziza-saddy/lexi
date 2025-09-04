@@ -63,6 +63,7 @@ import {
   Strikethrough,
   FileDown,
   FileUp,
+  CodeSquare,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -80,7 +81,7 @@ import {
   ImageDialog,
 } from "@/components/editor/dialogs";
 import { ColorPicker } from "./color-picker";
-import { ANIMATION_CONFIG } from "@/lib/editor/constants";
+import { ANIMATION_CONFIG } from "@/lib/editor/configs";
 import { $createImageNode } from "@/lib/editor/nodes/ImageNode";
 import { $patchStyleText } from "@lexical/selection";
 import { HIGHLIGHT_COLORS } from "@/lib/editor/colors";
@@ -157,12 +158,12 @@ export function Toolbar() {
           isNumberedList: blockType === "numbered",
           isCheckList: blockType === "check",
           isQuote: blockType === "quote",
-          isCodeBlock: blockType === "code",
+          isTextCode: selection.hasFormat("italic"),
           isStrikethrough: selection.hasFormat("strikethrough"),
           isBold: selection.hasFormat("bold"),
           isItalic: selection.hasFormat("italic"),
           isUnderline: selection.hasFormat("underline"),
-          isCode: selection.hasFormat("code"),
+          isCodeBlock: $isCodeNode(node),
           isHighlight: selection.hasFormat("highlight"),
           isSubscript: selection.hasFormat("subscript"),
           isSuperscript: selection.hasFormat("superscript"),
@@ -383,7 +384,7 @@ export function Toolbar() {
       </motion.div>
       <motion.div whileTap={{ scale: 0.95 }}>
         <Button
-          variant={toolbarState.isCode ? "secondary" : "ghost"}
+          variant={toolbarState.isCodeBlock ? "secondary" : "ghost"}
           size="sm"
           onClick={() =>
             editor.update(() => {
@@ -395,7 +396,7 @@ export function Toolbar() {
           }
           className="hover:bg-accent/80 transition-all duration-200"
         >
-          <Code className="size-4" />
+          <CodeSquare className="size-4" />
         </Button>
       </motion.div>
 
@@ -421,7 +422,12 @@ export function Toolbar() {
           format: "strikethrough",
           state: toolbarState.isStrikethrough,
         },
-        { key: "code", icon: Code, format: "code", state: toolbarState.isCode },
+        {
+          key: "code",
+          icon: Code,
+          format: "code",
+          state: toolbarState.isTextCode,
+        },
         {
           key: "subscript",
           icon: Subscript,

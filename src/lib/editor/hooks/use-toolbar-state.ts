@@ -14,7 +14,7 @@ export function useToolbarState() {
     isBold: false,
     isItalic: false,
     isUnderline: false,
-    isCode: false,
+    isTextCode: false,
     isLink: false,
     isHighlight: false,
     isSubscript: false,

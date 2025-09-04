@@ -15,8 +15,7 @@ import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPl
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { TRANSFORMERS } from "@lexical/markdown";
-import EditorTheme from "@/lib/editor/theme";
-import { EDITOR_CONFIG, ANIMATION_CONFIG } from "@/lib/editor/constants";
+import { EDITOR_CONFIG, ANIMATION_CONFIG } from "@/lib/editor/configs";
 import { Toolbar } from "@/components/editor/toolbar";
 import { FloatingToolbar } from "@/components/editor/floating-toolbar";
 import type { EditorProps } from "@/types/editor";
@@ -120,7 +119,6 @@ export function Editor({
   const initialConfig = {
     ...EDITOR_CONFIG,
     editorState: initialValue ? initialValue : null,
-    theme: EditorTheme,
     editable: !readOnly,
   };
 
