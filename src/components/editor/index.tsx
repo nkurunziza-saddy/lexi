@@ -15,10 +15,10 @@ import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPl
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { TRANSFORMERS } from "@lexical/markdown";
-import { EDITOR_CONFIG, ANIMATION_CONFIG } from "@/lib/editor/configs";
-import { Toolbar } from "@/components/editor/toolbar";
-import { FloatingToolbar } from "@/components/editor/floating-toolbar";
-import type { EditorProps } from "@/types/editor";
+import { EDITOR_CONFIG, ANIMATION_CONFIG } from "./lib/configs";
+import { Toolbar } from "@/components/editor/plugins/toolbar";
+import { FloatingToolbar } from "@/components/editor/plugins/floating-toolbar";
+import type { EditorProps } from "@/components/editor/lib/types/editor";
 import { $getRoot, type EditorState, type LexicalEditor } from "lexical";
 
 function EditorContent({

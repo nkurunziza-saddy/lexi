@@ -1,6 +1,9 @@
 import type { LexicalEditor } from "lexical";
 import { $generateHtmlFromNodes } from "@lexical/html";
-import { $convertFromMarkdownString, $convertToMarkdownString } from "@lexical/markdown";
+import {
+  $convertFromMarkdownString,
+  $convertToMarkdownString,
+} from "@lexical/markdown";
 import { TRANSFORMERS } from "@lexical/markdown";
 import { $getRoot } from "lexical";
 

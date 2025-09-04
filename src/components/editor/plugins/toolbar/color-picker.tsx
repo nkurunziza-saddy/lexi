@@ -19,7 +19,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { FONT_COLORS } from "@/lib/editor/colors";
+import { FONT_COLORS } from "../../lib/colors";
 
 export function ColorPicker({
   editor,

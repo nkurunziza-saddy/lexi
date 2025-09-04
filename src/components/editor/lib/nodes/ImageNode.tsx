@@ -2,7 +2,7 @@ import type { JSX } from "react";
 import { DecoratorNode } from "lexical";
 import { motion } from "motion/react";
 
-import type { ImageNodeSerialized } from "@/types/editor";
+import type { ImageNodeSerialized } from "@/components/editor/lib/types/editor";
 import { ANIMATION_CONFIG } from "../configs";
 
 export class ImageNode extends DecoratorNode<JSX.Element> {

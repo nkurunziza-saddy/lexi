@@ -1,6 +1,6 @@
 import { cubicBezier } from "motion/react";
 import { nodes } from "./nodes";
-import EditorTheme from "@/lib/editor/theme";
+import EditorTheme from "./theme";
 
 export const ANIMATION_CONFIG = {
   spring: {

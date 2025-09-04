@@ -11,7 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ANIMATION_CONFIG } from "@/lib/editor/configs";
+import { ANIMATION_CONFIG } from "../lib/configs";
 
 export function LinkDialog({
   isOpen,

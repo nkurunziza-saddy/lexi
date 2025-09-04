@@ -74,23 +74,19 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { useToolbarState } from "@/lib/editor/hooks/use-toolbar-state";
-import {
-  LinkDialog,
-  TableDialog,
-  ImageDialog,
-} from "@/components/editor/dialogs";
+import { useToolbarState } from "../../lib/hooks/use-toolbar-state";
+import { LinkDialog, TableDialog, ImageDialog } from "../../components";
 import { ColorPicker } from "./color-picker";
-import { ANIMATION_CONFIG } from "@/lib/editor/configs";
-import { $createImageNode } from "@/lib/editor/nodes/ImageNode";
+import { ANIMATION_CONFIG } from "../../lib/configs";
+import { $createImageNode } from "../../lib/nodes/ImageNode";
 import { $patchStyleText } from "@lexical/selection";
-import { HIGHLIGHT_COLORS } from "@/lib/editor/colors";
+import { HIGHLIGHT_COLORS } from "../../lib/colors";
 import {
   copyAsPlainText,
   exportAsHTML,
   exportAsMarkdown,
-} from "@/lib/editor/export";
-import { importMarkdown } from "@/lib/editor/import";
+  importMarkdown,
+} from "../../lib/utils";
 
 export function Toolbar() {
   const [editor] = useLexicalComposerContext();

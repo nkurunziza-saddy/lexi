@@ -13,9 +13,9 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { ANIMATION_CONFIG } from "@/lib/editor/configs";
-import { HIGHLIGHT_COLORS } from "@/lib/editor/colors";
-import { useFloatingToolbar } from "@/lib/editor/hooks/use-floating-toolbar";
+import { ANIMATION_CONFIG } from "../../lib/configs";
+import { HIGHLIGHT_COLORS } from "../../lib/colors";
+import { useFloatingToolbar } from "../../lib/hooks/use-floating-toolbar";
 
 export function FloatingToolbar() {
   const [editor] = useLexicalComposerContext();
