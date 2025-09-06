@@ -43,7 +43,7 @@ export const theme: EditorThemeClasses = {
   text: {
     bold: "font-bold",
     capitalize: "capitalize",
-    code: "bg-muted/80 mx-1 px-1.5 py-0.5 rounded text-sm font-mono border border-border",
+    code: "bg-editor-muted/80 mx-1 px-1.5 py-0.5 rounded text-sm font-mono border border-border",
     highlight: "bg-yellow-200/40 px-1 rounded",
     italic: "italic",
     lowercase: "lowercase",
@@ -92,7 +92,7 @@ export const theme: EditorThemeClasses = {
     variable: "text-yellow-600 dark:text-yellow-400",
   },
 
-  link: "text-primary hover:text-primary/80 underline decoration-primary/50 hover:decoration-primary transition-colors duration-200 cursor-pointer",
+  link: "text-editor-accent hover:text-editor-primary/80 underline decoration-primary/50 hover:decoration-editor-primary transition-colors duration-200 cursor-pointer",
 
   table:
     "border-collapse table-fixed w-full max-w-[80vw] my-4 border border-border rounded-lg overflow-hidden",
@@ -132,14 +132,14 @@ export const theme: EditorThemeClasses = {
 
   embedBlock: {
     base: "select-none my-2",
-    focus: "outline-2 outline-primary rounded",
+    focus: "outline-2 outline-editor-primary rounded",
   },
 
   layoutContainer: "grid gap-4 my-4",
   layoutItem:
     "border border-dashed border-border p-4 min-w-0 max-w-full rounded-lg",
 
-  autocomplete: "text-muted-foreground bg-muted/50 px-2 py-1 rounded",
+  autocomplete: "text-editor-muted-foreground bg-muted/50 px-2 py-1 rounded",
 
   tab: "lexical-tab-node",
 

@@ -22,7 +22,7 @@ import {
   mergeRegister,
   $findMatchingParent,
 } from "@lexical/utils";
-import { LinkIcon, Highlighter } from "lucide-react";
+import { LinkIcon, Highlighter, Github } from "lucide-react";
 import { FileActions } from "./extensions/file-actions";
 import { TableButtons } from "./extensions/table-buttons";
 import { InsertDropDown } from "./extensions/insert-actions";
@@ -45,6 +45,7 @@ import { ListButtons } from "./extensions/list-buttons";
 import { BlockTypeButtons } from "./extensions/block-type-buttons";
 import { $isHeadingNode, $isQuoteNode } from "@lexical/rich-text";
 import Separator from "../../components/toolbar-separator";
+import { ModeToggle } from "../../components/theme-toggler";
 
 const initialState = {
   isBold: false,
@@ -371,6 +372,17 @@ export function Toolbar() {
       <Separator />
 
       <FileActions />
+      <div className="ml-auto">
+        <ModeToggle />
+        <Button size={"sm"} variant={"ghost"}>
+          <a
+            target="_blank"
+            href="https://github.com/nkurunziza-saddy/text-editor"
+          >
+            <Github className="size-4" />
+          </a>
+        </Button>
+      </div>
     </div>
   );
 }

@@ -109,7 +109,7 @@ function EditorPlugins({
 
 export function Editor({
   initialValue = "",
-  placeholder = "Start writing your ...",
+  placeholder = 'Start writing or use "/" for quick commands',
   className = "",
   minHeight = "400px",
   maxHeight,
