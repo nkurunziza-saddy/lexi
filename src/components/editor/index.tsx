@@ -15,6 +15,7 @@ import { HorizontalRulePlugin } from "@lexical/react/LexicalHorizontalRulePlugin
 import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPlugin";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
+import SlashCommandPlugin from "./plugins/slash-command";
 import { TRANSFORMERS } from "@lexical/markdown";
 import { EDITOR_CONFIG } from "./lib/configs";
 import { Toolbar } from "@/components/editor/plugins/toolbar";
@@ -95,6 +96,7 @@ function EditorPlugins({
         hasTabHandler={true}
       />
       <TableHoverActionsPlugin />
+      <SlashCommandPlugin />
       <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
       <OnChangePlugin onChange={onChange} />
       {showFloatingToolbar && <FloatingToolbar />}
@@ -107,7 +109,7 @@ function EditorPlugins({
 
 export function Editor({
   initialValue = "",
-  placeholder = "Start writing your masterpiece...",
+  placeholder = "Start writing your ...",
   className = "",
   minHeight = "400px",
   maxHeight,
