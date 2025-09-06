@@ -1,7 +1,5 @@
 import type React from "react";
 import { useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,7 +9,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ANIMATION_CONFIG } from "../lib/configs";
 
 export function TableDialog({
   isOpen,
@@ -32,16 +29,14 @@ export function TableDialog({
   };
 
   return (
-    <AnimatePresence>
+    <>
       {isOpen && (
         <Dialog open={isOpen} onOpenChange={onClose}>
-          <DialogContent className="sm:max-w-md backdrop-blur-md bg-background/95">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={ANIMATION_CONFIG.spring}
-            >
+          <DialogContent
+            aria-describedby="table-dialog"
+            className="sm:max-w-md backdrop-blur-md bg-background/95"
+          >
+            <div>
               <DialogHeader>
                 <DialogTitle className="text-xl font-semibold">
                   Insert Table
@@ -98,10 +93,10 @@ export function TableDialog({
                   </Button>
                 </div>
               </form>
-            </motion.div>
+            </div>
           </DialogContent>
         </Dialog>
       )}
-    </AnimatePresence>
+    </>
   );
 }

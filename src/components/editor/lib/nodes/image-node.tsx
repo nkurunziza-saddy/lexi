@@ -1,9 +1,7 @@
 import type { JSX } from "react";
 import { DecoratorNode } from "lexical";
-import { motion } from "motion/react";
 
 import type { ImageNodeSerialized } from "@/components/editor/lib/types/editor";
-import { ANIMATION_CONFIG } from "../configs";
 
 export class ImageNode extends DecoratorNode<JSX.Element> {
   __src: string;
@@ -49,18 +47,18 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
 
   decorate(): JSX.Element {
     return (
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={ANIMATION_CONFIG.spring}
-        className="my-4"
-      >
+      <div>
         <img
           src={this.__src || "/placeholder.svg"}
           alt={this.__alt}
-          className="max-w-full h-auto rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300"
+          style={{
+            height: "inherit",
+            width: "inherit",
+            maxWidth: 500,
+          }}
+          // onError={() => setIsLoadError(true)}
         />
-      </motion.div>
+      </div>
     );
   }
 }

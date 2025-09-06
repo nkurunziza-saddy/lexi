@@ -1,6 +1,5 @@
 import type React from "react";
 import { useState, useRef } from "react";
-import { motion, AnimatePresence } from "motion/react";
 import { Upload } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -12,7 +11,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ANIMATION_CONFIG } from "../lib/configs";
 
 export function ImageDialog({
   isOpen,
@@ -21,7 +19,7 @@ export function ImageDialog({
 }: {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (src: string, alt?: string) => void;
+  onSubmit: (src: string, alt: string) => void;
 }) {
   const [url, setUrl] = useState("");
   const [alt, setAlt] = useState("");
@@ -55,16 +53,14 @@ export function ImageDialog({
   };
 
   return (
-    <AnimatePresence>
+    <>
       {isOpen && (
         <Dialog open={isOpen} onOpenChange={onClose}>
-          <DialogContent className="sm:max-w-md backdrop-blur-md bg-background/95">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={ANIMATION_CONFIG.spring}
-            >
+          <DialogContent
+            aria-describedby="image-dialog"
+            className="sm:max-w-md backdrop-blur-md bg-background/95"
+          >
+            <div>
               <DialogHeader>
                 <DialogTitle className="text-xl font-semibold">
                   Insert Image
@@ -140,10 +136,10 @@ export function ImageDialog({
                   </Button>
                 </div>
               </div>
-            </motion.div>
+            </div>
           </DialogContent>
         </Dialog>
       )}
-    </AnimatePresence>
+    </>
   );
 }

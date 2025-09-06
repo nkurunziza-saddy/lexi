@@ -1,23 +1,24 @@
 import type { EditorThemeClasses } from "lexical";
+import "../../../../index.css";
 import "./editor-theme.css";
 
 export const theme: EditorThemeClasses = {
   ltr: "text-left",
   rtl: "text-right",
 
-  paragraph: "mb-4 leading-relaxed relative",
+  paragraph: "m-0 leading-relaxed relative",
 
   heading: {
-    h1: "text-4xl font-bold mb-6 mt-8 text-foreground",
-    h2: "text-3xl font-semibold mb-4 mt-6 text-foreground/95",
-    h3: "text-2xl font-medium mb-3 mt-5 text-foreground/90",
-    h4: "text-xl font-medium mb-2 mt-4 text-foreground/85",
-    h5: "text-lg font-medium mb-2 mt-4 text-foreground/80",
-    h6: "text-base font-medium mb-2 mt-4 text-foreground/80",
+    h1: "text-4xl font-bold m-0 text-foreground",
+    h2: "text-3xl font-semibold m-0 text-foreground/95",
+    h3: "text-2xl font-medium m-0 text-foreground/90",
+    h4: "text-xl font-medium m-0 text-foreground/85",
+    h5: "text-lg font-medium m-0 text-foreground/80",
+    h6: "text-base font-medium m-0 text-foreground/80",
   },
 
   quote:
-    "pl-4 border-l-4 border-muted-foreground/40 text-muted-foreground italic my-4 ml-5 mb-4 text-sm",
+    "ml-5 mb-2.5 border-l-4 border-muted-foreground/40 text-muted-foreground italic text-sm",
 
   list: {
     nested: {
@@ -30,19 +31,19 @@ export const theme: EditorThemeClasses = {
       "list-[upper-roman] list-outside p-0 m-0",
       "list-[lower-roman] list-outside p-0 m-0",
     ],
-    ol: "list-decimal list-outside p-0 m-0 mb-4",
-    ul: "list-disc list-outside p-0 m-0 mb-4",
+    ol: "list-decimal list-outside p-0 m-0",
+    ul: "list-disc list-outside p-0 m-0",
     listitem: "mx-8",
-    listitemChecked: "lexical-checklist-item lexical-checklist-item--checked",
+    listitemChecked: " lexical-checklist-item lexical-checklist-item--checked",
     listitemUnchecked:
-      "lexical-checklist-item lexical-checklist-item--unchecked",
+      " lexical-checklist-item lexical-checklist-item--unchecked",
     checklist: "space-y-2",
   },
 
   text: {
     bold: "font-bold",
     capitalize: "capitalize",
-    code: "bg-muted/80 px-2 py-1 rounded-md text-sm font-mono border shadow-sm",
+    code: "bg-muted/80 m-0 px-2 py-1 rounded-md text-sm font-mono border shadow-sm",
     highlight: "bg-yellow-200/30 border-b-2 border-yellow-300/50 px-1 py-0.5",
     italic: "italic",
     lowercase: "lowercase",
@@ -94,18 +95,17 @@ export const theme: EditorThemeClasses = {
   link: "text-primary hover:underline cursor-pointer",
 
   table:
-    "border-collapse border-spacing-0 table-fixed w-fit my-6 overflow-auto",
+    "border-collapse border-spacing-0 table-fixed w-full my-6",
   tableAddColumns: "lexical-table-add-columns",
   tableAddRows: "lexical-table-add-rows",
   tableAlignment: {
     center: "mx-auto",
     right: "ml-auto",
   },
-  tableCell:
-    "border border-border px-2 py-1.5 w-20 align-top text-left relative outline-none overflow-auto min-w-[100px]",
+  tableCell: "lexical-table-cell",
   tableCellActionButton: "lexical-table-cell-action-button",
   tableCellActionButtonContainer: "lexical-table-cell-action-button-container",
-  tableCellHeader: "bg-muted font-semibold text-left",
+  tableCellHeader: "lexical-table-cell-header",
   tableCellResizer: "lexical-table-cell-resizer",
   tableCellSelected: "lexical-table-cell-selected",
   tableFrozenColumn: "lexical-table-frozen-column",

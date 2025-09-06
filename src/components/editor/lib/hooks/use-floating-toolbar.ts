@@ -1,6 +1,11 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { $getSelection, $isRangeSelection, SELECTION_CHANGE_COMMAND, COMMAND_PRIORITY_LOW } from "lexical";
+import {
+  $getSelection,
+  $isRangeSelection,
+  SELECTION_CHANGE_COMMAND,
+  COMMAND_PRIORITY_LOW,
+} from "lexical";
 import { mergeRegister } from "@lexical/utils";
 
 export function useFloatingToolbar() {
@@ -38,6 +43,9 @@ export function useFloatingToolbar() {
         if (selection.hasFormat("italic")) formats.add("italic");
         if (selection.hasFormat("underline")) formats.add("underline");
         if (selection.hasFormat("code")) formats.add("code");
+        if (selection.hasFormat("strikethrough")) formats.add("strikethrough");
+        if (selection.hasFormat("superscript")) formats.add("superscript");
+        if (selection.hasFormat("subscript")) formats.add("subscript");
         setActiveFormats(formats);
       } else {
         setIsVisible(false);

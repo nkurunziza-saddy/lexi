@@ -1,6 +1,6 @@
 import type React from "react";
 import { useState, useCallback } from "react";
-import { motion } from "motion/react";
+
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
@@ -10,16 +10,17 @@ import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin";
 import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { CheckListPlugin } from "@lexical/react/LexicalCheckListPlugin";
 import { TablePlugin } from "@lexical/react/LexicalTablePlugin";
+import TableHoverActionsPlugin from "./plugins/table-hover-actions";
 import { HorizontalRulePlugin } from "@lexical/react/LexicalHorizontalRulePlugin";
 import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPlugin";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { TRANSFORMERS } from "@lexical/markdown";
-import { EDITOR_CONFIG, ANIMATION_CONFIG } from "./lib/configs";
+import { EDITOR_CONFIG } from "./lib/configs";
 import { Toolbar } from "@/components/editor/plugins/toolbar";
 import { FloatingToolbar } from "@/components/editor/plugins/floating-toolbar";
 import type { EditorProps } from "@/components/editor/lib/types/editor";
-import { $getRoot, type EditorState, type LexicalEditor } from "lexical";
+import { type EditorState, type LexicalEditor } from "lexical";
 
 function EditorContent({
   placeholder = "Start writing ...",
@@ -55,14 +56,9 @@ function EditorContent({
           />
         }
         placeholder={
-          <motion.div
-            className="absolute top-6 md:top-8 left-6 md:left-8 text-muted-foreground/60 pointer-events-none select-none text-base md:text-lg"
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={ANIMATION_CONFIG.smooth}
-          >
+          <div className="absolute top-6 md:top-8 left-6 md:left-8 text-muted-foreground/60 pointer-events-none select-none text-base md:text-lg">
             {placeholder}
-          </motion.div>
+          </div>
         }
         ErrorBoundary={LexicalErrorBoundary}
       />
@@ -90,8 +86,15 @@ function EditorPlugins({
       <ListPlugin />
       <CheckListPlugin />
       <LinkPlugin />
-      <TablePlugin hasCellMerge={true} hasCellBackgroundColor={true} />
+
       <HorizontalRulePlugin />
+      {/* Table plugins - order matters! */}
+      <TablePlugin
+        hasCellMerge={true}
+        hasCellBackgroundColor={true}
+        hasTabHandler={true}
+      />
+      <TableHoverActionsPlugin />
       <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
       <OnChangePlugin onChange={onChange} />
       {showFloatingToolbar && <FloatingToolbar />}
@@ -114,7 +117,7 @@ export function Editor({
   onChange,
   plugins = [],
 }: EditorProps) {
-  const [editorState, setEditorState] = useState<string>(initialValue);
+  const [_, setEditorState] = useState<string>(initialValue);
 
   const initialConfig = {
     ...EDITOR_CONFIG,
@@ -126,12 +129,6 @@ export function Editor({
     (editorState: any) => {
       const jsonState = editorState.toJSON();
       const jsonString = JSON.stringify(jsonState);
-
-      editorState.read(() => {
-        const root = $getRoot();
-        const textContent = root.getTextContent();
-        console.log("Plain text:", textContent);
-      });
 
       setEditorState(jsonString);
       onChange?.(jsonString);

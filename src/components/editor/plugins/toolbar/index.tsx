@@ -1,71 +1,33 @@
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect, useReducer } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { motion } from "motion/react";
+
 import {
   $getSelection,
   $isRangeSelection,
-  FORMAT_TEXT_COMMAND,
-  FORMAT_ELEMENT_COMMAND,
   SELECTION_CHANGE_COMMAND,
   CAN_UNDO_COMMAND,
   CAN_REDO_COMMAND,
-  UNDO_COMMAND,
-  REDO_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
+  type ElementNode,
+  type TextNode,
 } from "lexical";
-import {
-  $setBlocksType,
-  $getSelectionStyleValueForProperty,
-} from "@lexical/selection";
-import {
-  $createHeadingNode,
-  $createQuoteNode,
-  $isHeadingNode,
-  $isQuoteNode,
-} from "@lexical/rich-text";
-import {
-  INSERT_UNORDERED_LIST_COMMAND,
-  INSERT_ORDERED_LIST_COMMAND,
-  INSERT_CHECK_LIST_COMMAND,
-  $isListNode,
-  ListNode,
-} from "@lexical/list";
-import { $createCodeNode, $isCodeNode } from "@lexical/code";
-import { INSERT_HORIZONTAL_RULE_COMMAND } from "@lexical/react/LexicalHorizontalRuleNode";
+import { $patchStyleText } from "@lexical/selection";
+import { BlockFormatDropDown } from "./extensions/block-format-dropdown";
+import { $isListNode, ListNode } from "@lexical/list";
+import { $isCodeNode } from "@lexical/code";
 import { TOGGLE_LINK_COMMAND, $isLinkNode } from "@lexical/link";
-import { INSERT_TABLE_COMMAND } from "@lexical/table";
-import { $getNearestNodeOfType } from "@lexical/utils";
+import { INSERT_TABLE_COMMAND, $isTableCellNode } from "@lexical/table";
 import {
-  Bold,
-  Italic,
-  Underline,
-  Code,
-  LinkIcon,
-  List,
-  ListOrdered,
-  Quote,
-  Heading1,
-  Heading2,
-  Heading3,
-  Undo,
-  Redo,
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
-  Minus,
-  Plus,
-  Table,
-  ImageIcon,
-  ListChecks,
-  Highlighter,
-  Subscript,
-  Superscript,
-  Strikethrough,
-  FileDown,
-  FileUp,
-  CodeSquare,
-} from "lucide-react";
-
+  $getNearestNodeOfType,
+  mergeRegister,
+  $findMatchingParent,
+} from "@lexical/utils";
+import { LinkIcon, Highlighter } from "lucide-react";
+import { FileActions } from "./extensions/file-actions";
+import { TableButtons } from "./extensions/table-buttons";
+import { InsertDropDown } from "./extensions/insert-actions";
+import { AlignButtons } from "./extensions/align-buttons";
+import { TextFormatButtons } from "./extensions/text-format-buttons";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -74,39 +36,86 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { useToolbarState } from "../../lib/hooks/use-toolbar-state";
 import { LinkDialog, TableDialog, ImageDialog } from "../../components";
-import { ColorPicker } from "./color-picker";
-import { ANIMATION_CONFIG } from "../../lib/configs";
-import { $createImageNode } from "../../lib/nodes/ImageNode";
-import { $patchStyleText } from "@lexical/selection";
+import { $createImageNode } from "../../lib/nodes/image-node";
 import { HIGHLIGHT_COLORS } from "../../lib/colors";
-import {
-  copyAsPlainText,
-  exportAsHTML,
-  exportAsMarkdown,
-  importMarkdown,
-} from "../../lib/utils";
+import { ColorPicker } from "./extensions/color-picker";
+import { HistoryButtons } from "./extensions/history-buttons";
+import { ListButtons } from "./extensions/list-buttons";
+import { BlockTypeButtons } from "./extensions/block-type-buttons";
+import { $isHeadingNode, $isQuoteNode } from "@lexical/rich-text";
+
+const initialState = {
+  isBold: false,
+  isItalic: false,
+  isUnderline: false,
+  isStrikethrough: false,
+  isCode: false,
+  isLink: false,
+  isHighlight: false,
+  isSubscript: false,
+  isSuperscript: false,
+  isCapitalized: false,
+  isTable: false,
+  isBulletedList: false,
+  isNumberedList: false,
+  isCheckList: false,
+  isQuote: false,
+  isCodeBlock: false,
+  blockType: "paragraph",
+  canUndo: false,
+  canRedo: false,
+};
+
+type ToolbarState = typeof initialState;
+type Action =
+  | { type: "UPDATE"; payload: Partial<ToolbarState> }
+  | { type: "SET_CAN_UNDO"; payload: boolean }
+  | { type: "SET_CAN_REDO"; payload: boolean };
+
+const toolbarReducer = (state: ToolbarState, action: Action): ToolbarState => {
+  switch (action.type) {
+    case "UPDATE":
+      return { ...state, ...action.payload };
+    case "SET_CAN_UNDO":
+      return { ...state, canUndo: action.payload };
+    case "SET_CAN_REDO":
+      return { ...state, canRedo: action.payload };
+    default:
+      return state;
+  }
+};
 
 export function Toolbar() {
   const [editor] = useLexicalComposerContext();
-  const { toolbarState, setToolbarState } = useToolbarState();
+  const [toolbarState, dispatch] = useReducer(toolbarReducer, initialState);
   const [showLinkDialog, setShowLinkDialog] = useState(false);
   const [showTableDialog, setShowTableDialog] = useState(false);
   const [showImageDialog, setShowImageDialog] = useState(false);
-  const importInputRef = useRef<HTMLInputElement>(null);
-
-  const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      importMarkdown(editor, file);
-    }
-  };
 
   const updateToolbar = useCallback(() => {
-    let newToolbarState = {};
     editor.read(() => {
       const selection = $getSelection();
+      const newToolbarState = {
+        isBulletedList: false,
+        isNumberedList: false,
+        isCheckList: false,
+        isQuote: false,
+        isCodeBlock: false,
+        isStrikethrough: false,
+        isBold: false,
+        isItalic: false,
+        isUnderline: false,
+        isCode: false,
+        isLink: false,
+        isHighlight: false,
+        isSubscript: false,
+        isSuperscript: false,
+        isCapitalized: false,
+        isTable: false,
+        blockType: "paragraph",
+      };
+
       if ($isRangeSelection(selection)) {
         const anchorNode = selection.anchor.getNode();
         const element =
@@ -129,65 +138,58 @@ export function Toolbar() {
             blockType = "code";
           }
         }
+        newToolbarState.blockType = blockType;
+
+        const cell = $findMatchingParent(anchorNode, (node) =>
+          $isTableCellNode(node)
+        );
+        newToolbarState.isTable = cell !== null;
 
         let isLink = false;
-        let node:
-          | import("lexical").ElementNode
-          | import("lexical").TextNode
-          | null = anchorNode;
+        let node: ElementNode | TextNode | null = anchorNode;
         while (node) {
           if ($isLinkNode(node)) {
             isLink = true;
             break;
           }
-          const parent: import("lexical").ElementNode | null = node.getParent();
+          const parent: ElementNode | null = node.getParent();
           if (parent === node) break;
           node = parent;
         }
+        newToolbarState.isLink = isLink;
 
-        newToolbarState = {
-          blockType: blockType,
-          isHeading1: blockType === "h1",
-          isHeading2: blockType === "h2",
-          isHeading3: blockType === "h3",
-          isBulletedList: blockType === "bullet",
-          isNumberedList: blockType === "numbered",
-          isCheckList: blockType === "check",
-          isQuote: blockType === "quote",
-          isTextCode: selection.hasFormat("italic"),
-          isStrikethrough: selection.hasFormat("strikethrough"),
-          isBold: selection.hasFormat("bold"),
-          isItalic: selection.hasFormat("italic"),
-          isUnderline: selection.hasFormat("underline"),
-          isCodeBlock: $isCodeNode(node),
-          isHighlight: selection.hasFormat("highlight"),
-          isSubscript: selection.hasFormat("subscript"),
-          isSuperscript: selection.hasFormat("superscript"),
-          isLink: isLink,
-          fontColor: $getSelectionStyleValueForProperty(
-            selection,
-            "color",
-            "hsl(var(--foreground))"
-          ),
-        };
+        newToolbarState.isBulletedList = blockType === "bullet";
+        newToolbarState.isNumberedList = blockType === "number";
+        newToolbarState.isCheckList = blockType === "check";
+        newToolbarState.isQuote = blockType === "quote";
+        newToolbarState.isCodeBlock = blockType === "code";
+
+        newToolbarState.isBold = selection.hasFormat("bold");
+        newToolbarState.isItalic = selection.hasFormat("italic");
+        newToolbarState.isUnderline = selection.hasFormat("underline");
+        newToolbarState.isStrikethrough = selection.hasFormat("strikethrough");
+        newToolbarState.isCode = selection.hasFormat("code");
+        newToolbarState.isHighlight = selection.hasFormat("highlight");
+        newToolbarState.isSubscript = selection.hasFormat("subscript");
+        newToolbarState.isSuperscript = selection.hasFormat("superscript");
+        newToolbarState.isCapitalized = selection.hasFormat("capitalize");
       }
+
+      dispatch({ type: "UPDATE", payload: newToolbarState });
     });
-    setToolbarState((prev) => ({
-      ...prev,
-      ...newToolbarState,
-    }));
-  }, [editor, setToolbarState]);
+  }, [editor]);
 
   useEffect(() => {
-    return editor.registerCommand(
-      SELECTION_CHANGE_COMMAND,
-      () => {
-        editor.read(() => {
+    return mergeRegister(
+      editor.registerUpdateListener(updateToolbar),
+      editor.registerCommand(
+        SELECTION_CHANGE_COMMAND,
+        () => {
           updateToolbar();
-        });
-        return false;
-      },
-      COMMAND_PRIORITY_CRITICAL
+          return false;
+        },
+        COMMAND_PRIORITY_CRITICAL
+      )
     );
   }, [editor, updateToolbar]);
 
@@ -195,23 +197,23 @@ export function Toolbar() {
     return editor.registerCommand(
       CAN_UNDO_COMMAND,
       (payload: boolean) => {
-        setToolbarState((prev) => ({ ...prev, canUndo: payload }));
+        dispatch({ type: "SET_CAN_UNDO", payload });
         return false;
       },
       COMMAND_PRIORITY_CRITICAL
     );
-  }, [editor, setToolbarState]);
+  }, [editor]);
 
   useEffect(() => {
     return editor.registerCommand(
       CAN_REDO_COMMAND,
       (payload: boolean) => {
-        setToolbarState((prev) => ({ ...prev, canRedo: payload }));
+        dispatch({ type: "SET_CAN_REDO", payload });
         return false;
       },
       COMMAND_PRIORITY_CRITICAL
     );
-  }, [editor, setToolbarState]);
+  }, [editor]);
 
   const insertLink = () => {
     if (!toolbarState.isLink) {
@@ -234,7 +236,7 @@ export function Toolbar() {
     });
   };
 
-  const handleImageSubmit = (src: string, alt?: string) => {
+  const handleImageSubmit = (src: string, alt: string) => {
     editor.update(() => {
       const selection = $getSelection();
       if ($isRangeSelection(selection)) {
@@ -245,227 +247,28 @@ export function Toolbar() {
   };
 
   return (
-    <motion.div
-      layout
-      className="flex items-center gap-1 p-3 border-b bg-gradient-to-r from-background via-background to-accent/5 backdrop-blur-sm flex-wrap"
-      initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={ANIMATION_CONFIG.smooth}
-    >
-      <motion.div whileTap={{ scale: 0.95 }}>
-        <Button
-          variant="ghost"
-          size="sm"
-          disabled={!toolbarState.canUndo}
-          onClick={() => editor.dispatchCommand(UNDO_COMMAND, undefined)}
-          title="Undo"
-          className="hover:bg-accent/80 transition-all duration-200"
-        >
-          <Undo className="size-4" />
-        </Button>
-      </motion.div>
-      <motion.div whileTap={{ scale: 0.95 }}>
-        <Button
-          variant="ghost"
-          size="sm"
-          disabled={!toolbarState.canRedo}
-          onClick={() => editor.dispatchCommand(REDO_COMMAND, undefined)}
-          title="Redo"
-          className="hover:bg-accent/80 transition-all duration-200"
-        >
-          <Redo className="size-4" />
-        </Button>
-      </motion.div>
+    <div className="flex items-center gap-1 p-3 border-b bg-gradient-to-r from-background via-background to-accent/5 backdrop-blur-sm flex-wrap">
+      <HistoryButtons
+        canUndo={toolbarState.canUndo}
+        canRedo={toolbarState.canRedo}
+      />
+
+      <div className="w-px h-6 bg-gradient-to-b from-transparent via-border to-transparent mx-2" />
+      <BlockFormatDropDown blockType={toolbarState.blockType} />
 
       <div className="w-px h-6 bg-gradient-to-b from-transparent via-border to-transparent mx-2" />
 
-      <div className="w-px h-6 bg-gradient-to-b from-transparent via-border to-transparent mx-2" />
-
-      {[
-        {
-          key: "h1",
-          icon: Heading1,
-          format: "h1",
-          state: toolbarState.blockType === "h1",
-        },
-        {
-          key: "h2",
-          icon: Heading2,
-          format: "h2",
-          state: toolbarState.blockType === "h2",
-        },
-        {
-          key: "h3",
-          icon: Heading3,
-          format: "h3",
-          state: toolbarState.blockType === "h3",
-        },
-      ].map(({ key, icon: Icon, format, state }) => (
-        <motion.div key={key} whileTap={{ scale: 0.95 }}>
-          <Button
-            variant={state ? "secondary" : "ghost"}
-            size="sm"
-            onClick={() =>
-              editor.update(() => {
-                const selection = $getSelection();
-                if ($isRangeSelection(selection)) {
-                  $setBlocksType(selection, () =>
-                    $createHeadingNode(format as "h1" | "h2" | "h3")
-                  );
-                }
-              })
-            }
-            className="hover:bg-accent/80 transition-all duration-200"
-          >
-            <Icon className="size-4" />
-          </Button>
-        </motion.div>
-      ))}
+      <ListButtons toolbarState={toolbarState} />
+      <BlockTypeButtons toolbarState={toolbarState} />
 
       <div className="w-px h-6 bg-gradient-to-b from-transparent via-border to-transparent mx-2" />
 
-      <motion.div whileTap={{ scale: 0.95 }}>
-        <Button
-          variant={toolbarState.isBulletedList ? "secondary" : "ghost"}
-          size="sm"
-          onClick={() =>
-            editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined)
-          }
-          className="hover:bg-accent/80 transition-all duration-200"
-        >
-          <List className="size-4" />
-        </Button>
-      </motion.div>
-      <motion.div whileTap={{ scale: 0.95 }}>
-        <Button
-          variant={toolbarState.isNumberedList ? "secondary" : "ghost"}
-          size="sm"
-          onClick={() =>
-            editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined)
-          }
-          className="hover:bg-accent/80 transition-all duration-200"
-        >
-          <ListOrdered className="size-4" />
-        </Button>
-      </motion.div>
-      <div className="w-px h-6 bg-gradient-to-b from-transparent via-border to-transparent mx-2" />
-      <motion.div whileTap={{ scale: 0.95 }}>
-        <Button
-          variant={toolbarState.isCheckList ? "secondary" : "ghost"}
-          size="sm"
-          onClick={() =>
-            editor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, undefined)
-          }
-          className="hover:bg-accent/80 transition-all duration-200"
-        >
-          <ListChecks className="size-4" />
-        </Button>
-      </motion.div>
-      <motion.div whileTap={{ scale: 0.95 }}>
-        <Button
-          variant={toolbarState.isQuote ? "secondary" : "ghost"}
-          size="sm"
-          onClick={() =>
-            editor.update(() => {
-              const selection = $getSelection();
-              if ($isRangeSelection(selection)) {
-                $setBlocksType(selection, () => $createQuoteNode());
-              }
-            })
-          }
-          className="hover:bg-accent/80 transition-all duration-200"
-        >
-          <Quote className="size-4" />
-        </Button>
-      </motion.div>
-      <motion.div whileTap={{ scale: 0.95 }}>
-        <Button
-          variant={toolbarState.isCodeBlock ? "secondary" : "ghost"}
-          size="sm"
-          onClick={() =>
-            editor.update(() => {
-              const selection = $getSelection();
-              if ($isRangeSelection(selection)) {
-                $setBlocksType(selection, () => $createCodeNode());
-              }
-            })
-          }
-          className="hover:bg-accent/80 transition-all duration-200"
-        >
-          <CodeSquare className="size-4" />
-        </Button>
-      </motion.div>
-
-      <div className="w-px h-6 bg-gradient-to-b from-transparent via-border to-transparent mx-2" />
-
-      {[
-        { key: "bold", icon: Bold, format: "bold", state: toolbarState.isBold },
-        {
-          key: "italic",
-          icon: Italic,
-          format: "italic",
-          state: toolbarState.isItalic,
-        },
-        {
-          key: "underline",
-          icon: Underline,
-          format: "underline",
-          state: toolbarState.isUnderline,
-        },
-        {
-          key: "strikethrough",
-          icon: Strikethrough,
-          format: "strikethrough",
-          state: toolbarState.isStrikethrough,
-        },
-        {
-          key: "code",
-          icon: Code,
-          format: "code",
-          state: toolbarState.isTextCode,
-        },
-        {
-          key: "subscript",
-          icon: Subscript,
-          format: "subscript",
-          state: toolbarState.isSubscript,
-        },
-        {
-          key: "superscript",
-          icon: Superscript,
-          format: "superscript",
-          state: toolbarState.isSuperscript,
-        },
-      ].map(({ key, icon: Icon, format, state }) => (
-        <motion.div key={key} whileTap={{ scale: 0.95 }}>
-          <Button
-            variant={state ? "secondary" : "ghost"}
-            size="sm"
-            onClick={() =>
-              editor.dispatchCommand(
-                FORMAT_TEXT_COMMAND,
-                format as
-                  | "subscript"
-                  | "superscript"
-                  | "bold"
-                  | "italic"
-                  | "underline"
-                  | "code"
-                  | "strikethrough"
-              )
-            }
-            className="hover:bg-accent/80 transition-all duration-200"
-          >
-            <Icon className="size-4" />
-          </Button>
-        </motion.div>
-      ))}
-
+      <TextFormatButtons toolbarState={toolbarState} />
       <ColorPicker editor={editor} />
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <motion.div whileTap={{ scale: 0.95 }}>
+          <div>
             <Button
               variant={toolbarState.isHighlight ? "secondary" : "ghost"}
               size="sm"
@@ -474,7 +277,7 @@ export function Toolbar() {
             >
               <Highlighter className="size-4" />
             </Button>
-          </motion.div>
+          </div>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="animate-in slide-in-from-top-2 duration-200">
           {HIGHLIGHT_COLORS.map((color) => (
@@ -515,8 +318,8 @@ export function Toolbar() {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-
-      <motion.div whileTap={{ scale: 0.95 }}>
+      <div className="w-px h-6 bg-gradient-to-b from-transparent via-border to-transparent mx-2" />
+      <div>
         <Button
           variant={toolbarState.isLink ? "secondary" : "ghost"}
           size="sm"
@@ -526,101 +329,25 @@ export function Toolbar() {
         >
           <LinkIcon className="size-4" />
         </Button>
-      </motion.div>
+      </div>
 
       <div className="w-px h-6 bg-gradient-to-b from-transparent via-border to-transparent mx-2" />
 
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <motion.div whileTap={{ scale: 0.95 }}>
-            <Button
-              variant="ghost"
-              size="sm"
-              title="Insert"
-              className="hover:bg-accent/80 transition-colors"
-            >
-              <Plus className="size-4" />
-            </Button>
-          </motion.div>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent
-          align="start"
-          className="animate-in slide-in-from-top-2 duration-200"
-        >
-          <DropdownMenuItem
-            onClick={() =>
-              editor.dispatchCommand(INSERT_HORIZONTAL_RULE_COMMAND, undefined)
-            }
-            className="hover:bg-accent/80 transition-colors"
-          >
-            <Minus className="mr-2 size-4" />
-            Divider
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => setShowTableDialog(true)}
-            className="hover:bg-accent/80 transition-colors"
-          >
-            <Table className="mr-2 size-4" />
-            Table
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => setShowImageDialog(true)}
-            className="hover:bg-accent/80 transition-colors"
-          >
-            <ImageIcon className="mr-2 size-4" />
-            Image
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <InsertDropDown
+        setShowTableDialog={setShowTableDialog}
+        setShowImageDialog={setShowImageDialog}
+      />
+
+      {toolbarState.isTable && (
+        <>
+          <div className="w-px h-6 bg-gradient-to-b from-transparent via-border to-transparent mx-2" />
+          <TableButtons />
+        </>
+      )}
 
       <div className="w-px h-6 bg-gradient-to-b from-transparent via-border to-transparent mx-2" />
 
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <motion.div whileTap={{ scale: 0.95 }}>
-            <Button
-              variant="ghost"
-              size="sm"
-              title="Text Alignment"
-              className="hover:bg-accent/80 transition-colors"
-            >
-              <AlignLeft className="size-4" />
-            </Button>
-          </motion.div>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent
-          align="start"
-          className="animate-in slide-in-from-top-2 duration-200"
-        >
-          <DropdownMenuItem
-            onClick={() =>
-              editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "left")
-            }
-            className="hover:bg-accent/80 transition-colors"
-          >
-            <AlignLeft className="mr-2 size-4" />
-            Left
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() =>
-              editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "center")
-            }
-            className="hover:bg-accent/80 transition-colors"
-          >
-            <AlignCenter className="mr-2 size-4" />
-            Center
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() =>
-              editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "right")
-            }
-            className="hover:bg-accent/80 transition-colors"
-          >
-            <AlignRight className="mr-2 size-4" />
-            Right
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <AlignButtons />
 
       <LinkDialog
         isOpen={showLinkDialog}
@@ -642,60 +369,7 @@ export function Toolbar() {
 
       <div className="w-px h-6 bg-gradient-to-b from-transparent via-border to-transparent mx-2" />
 
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <motion.div whileTap={{ scale: 0.95 }}>
-            <Button
-              variant="ghost"
-              size="sm"
-              title="Export"
-              className="hover:bg-accent/80 transition-colors"
-            >
-              <FileDown className="size-4" />
-            </Button>
-          </motion.div>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent
-          align="start"
-          className="animate-in slide-in-from-top-2 duration-200"
-        >
-          <DropdownMenuItem
-            onClick={() => exportAsHTML(editor)}
-            className="hover:bg-accent/80 transition-colors"
-          >
-            Save as HTML
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => exportAsMarkdown(editor)}
-            className="hover:bg-accent/80 transition-colors"
-          >
-            Save as Markdown
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => copyAsPlainText(editor)}
-            className="hover:bg-accent/80 transition-colors"
-          >
-            Copy as Plain Text
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-
-      <input
-        type="file"
-        accept=".md,.markdown"
-        ref={importInputRef}
-        onChange={handleImport}
-        className="hidden"
-      />
-      <Button
-        variant="ghost"
-        size="sm"
-        title="Import"
-        onClick={() => importInputRef.current?.click()}
-        className="hover:bg-accent/80 transition-colors"
-      >
-        <FileUp className="size-4" />
-      </Button>
-    </motion.div>
+      <FileActions />
+    </div>
   );
 }

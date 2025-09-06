@@ -1,6 +1,5 @@
 import type React from "react";
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "motion/react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,7 +10,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ANIMATION_CONFIG } from "../lib/configs";
 
 export function LinkDialog({
   isOpen,
@@ -41,16 +39,14 @@ export function LinkDialog({
   };
 
   return (
-    <AnimatePresence>
+    <>
       {isOpen && (
         <Dialog open={isOpen} onOpenChange={onClose}>
-          <DialogContent className="sm:max-w-md backdrop-blur-md bg-background/95">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={ANIMATION_CONFIG.spring}
-            >
+          <DialogContent
+            aria-describedby="link-dialog"
+            className="sm:max-w-md backdrop-blur-md bg-background/95"
+          >
+            <div>
               <DialogHeader>
                 <DialogTitle className="text-xl font-semibold">
                   Insert Link
@@ -82,10 +78,10 @@ export function LinkDialog({
                   </Button>
                 </div>
               </form>
-            </motion.div>
+            </div>
           </DialogContent>
         </Dialog>
       )}
-    </AnimatePresence>
+    </>
   );
 }

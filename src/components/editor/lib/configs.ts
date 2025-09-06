@@ -1,18 +1,5 @@
-import { cubicBezier } from "motion/react";
 import { nodes } from "./nodes";
-import EditorTheme from "./theme";
-
-export const ANIMATION_CONFIG = {
-  spring: {
-    type: "spring" as const,
-    stiffness: 400,
-    damping: 30,
-  },
-  smooth: {
-    duration: 0.2,
-    ease: cubicBezier(0.4, 0, 0.2, 1),
-  },
-};
+import EditorTheme from "./editor-theme";
 
 function onError(error: Error) {
   console.error("Lexical error:", error);

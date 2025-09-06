@@ -26,21 +26,32 @@ export default function App() {
   const [content, setContent] = useState("");
 
   return (
-    <div className="">
-      <Editor
-        {...EditorPresets.full}
-        onChange={setContent}
-        className="border-primary/20"
-      />
+    <main className="min-h-screen bg-background text-foreground">
+      <div className="container mx-auto p-4 sm:p-6 lg:p-8">
+        <header className="text-center mb-8">
+          <h1 className="text-4xl font-bold tracking-tight">Lexi Editor</h1>
+          <p className="text-muted-foreground mt-2">
+            A modern, extensible rich text editor.
+          </p>
+        </header>
 
-      {content && (
-        <div className="mt-8 p-4 bg-muted/30 rounded-lg">
-          <h4 className="font-medium mb-2">Editor Content (JSON):</h4>
-          <pre className="text-xs overflow-auto max-h-32 text-muted-foreground">
-            {content}
-          </pre>
+        <div className="bg-card border rounded-xl shadow-sm overflow-hidden">
+          <Editor
+            {...EditorPresets.full}
+            onChange={setContent}
+            className="border-0 shadow-none"
+          />
         </div>
-      )}
-    </div>
+
+        {content && (
+          <div className="mt-8 p-4 bg-muted/30 rounded-lg">
+            <h4 className="font-medium mb-2">Editor Content (JSON):</h4>
+            <pre className="text-xs overflow-auto max-h-48 text-muted-foreground bg-background p-4 rounded-md">
+              {JSON.stringify(JSON.parse(content), null, 2)}
+            </pre>
+          </div>
+        )}
+      </div>
+    </main>
   );
 }

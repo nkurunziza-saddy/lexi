@@ -1,10 +1,10 @@
 import { useState, useCallback, useEffect } from "react";
-import type { LexicalEditor } from "lexical";
 import {
   $getSelection,
   $isRangeSelection,
   SELECTION_CHANGE_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
+  type LexicalEditor,
 } from "lexical";
 import {
   $getSelectionStyleValueForProperty,
@@ -19,7 +19,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { FONT_COLORS } from "../../lib/colors";
+import { FONT_COLORS } from "../../../lib/colors";
 
 export function ColorPicker({
   editor,
