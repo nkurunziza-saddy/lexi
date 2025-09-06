@@ -375,10 +375,7 @@ export function Toolbar() {
       <div className="ml-auto">
         <ModeToggle />
         <Button size={"sm"} variant={"ghost"}>
-          <a
-            target="_blank"
-            href="https://github.com/nkurunziza-saddy/text-editor"
-          >
+          <a target="_blank" href="https://github.com/nkurunziza-saddy/lexi">
             <Github className="size-4" />
           </a>
         </Button>

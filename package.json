@@ -1,7 +1,11 @@
 {
   "name": "lexi",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.4.0",
+  "description": "A simple minimal rich text pluggable text editor",
+  "author": "Nkurunziza Saddy",
+  "license": "MIT",
+  "homepage": "https://github.com/nkurunziza-saddy/lexi",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,6 +13,16 @@
     "lint": "eslint .",
     "preview": "vite preview"
   },
+  "keywords": [
+    "lexical",
+    "text",
+    "rich",
+    "editor",
+    "vite",
+    "react",
+    "simple",
+    "minimal"
+  ],
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
     "@lexical/code": "^0.34.0",
