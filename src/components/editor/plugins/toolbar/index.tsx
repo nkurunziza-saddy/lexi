@@ -44,6 +44,7 @@ import { HistoryButtons } from "./extensions/history-buttons";
 import { ListButtons } from "./extensions/list-buttons";
 import { BlockTypeButtons } from "./extensions/block-type-buttons";
 import { $isHeadingNode, $isQuoteNode } from "@lexical/rich-text";
+import Separator from "../../components/toolbar-separator";
 
 const initialState = {
   isBold: false,
@@ -253,15 +254,15 @@ export function Toolbar() {
         canRedo={toolbarState.canRedo}
       />
 
-      <div className="w-px h-6 bg-gradient-to-b from-transparent via-border to-transparent mx-2" />
+      <Separator />
       <BlockFormatDropDown blockType={toolbarState.blockType} />
 
-      <div className="w-px h-6 bg-gradient-to-b from-transparent via-border to-transparent mx-2" />
+      <Separator />
 
       <ListButtons toolbarState={toolbarState} />
       <BlockTypeButtons toolbarState={toolbarState} />
 
-      <div className="w-px h-6 bg-gradient-to-b from-transparent via-border to-transparent mx-2" />
+      <Separator />
 
       <TextFormatButtons toolbarState={toolbarState} />
       <ColorPicker editor={editor} />
@@ -318,7 +319,7 @@ export function Toolbar() {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <div className="w-px h-6 bg-gradient-to-b from-transparent via-border to-transparent mx-2" />
+      <Separator />
       <div>
         <Button
           variant={toolbarState.isLink ? "secondary" : "ghost"}
@@ -331,7 +332,7 @@ export function Toolbar() {
         </Button>
       </div>
 
-      <div className="w-px h-6 bg-gradient-to-b from-transparent via-border to-transparent mx-2" />
+      <Separator />
 
       <InsertDropDown
         setShowTableDialog={setShowTableDialog}
@@ -340,12 +341,12 @@ export function Toolbar() {
 
       {toolbarState.isTable && (
         <>
-          <div className="w-px h-6 bg-gradient-to-b from-transparent via-border to-transparent mx-2" />
+          <Separator />
           <TableButtons />
         </>
       )}
 
-      <div className="w-px h-6 bg-gradient-to-b from-transparent via-border to-transparent mx-2" />
+      <Separator />
 
       <AlignButtons />
 
@@ -367,7 +368,7 @@ export function Toolbar() {
         onSubmit={handleImageSubmit}
       />
 
-      <div className="w-px h-6 bg-gradient-to-b from-transparent via-border to-transparent mx-2" />
+      <Separator />
 
       <FileActions />
     </div>
