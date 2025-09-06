@@ -8,7 +8,6 @@ import {
   Quote,
   CodeSquare,
   Minus,
-  Heading,
   Type,
 } from "lucide-react";
 import { $createHeadingNode, $createQuoteNode } from "@lexical/rich-text";
