@@ -15,7 +15,6 @@ export function ToolbarButton({ onClick, isActive, icon: Icon, title }: Props) {
         pressed={isActive}
         onPressedChange={onClick}
         size="sm"
-        variant="outline"
         title={title}
         aria-label={title}
         onMouseDown={(e) => e.preventDefault()}
