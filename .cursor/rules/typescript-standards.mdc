@@ -1,0 +1,41 @@
+---
+globs: *.ts,*.tsx
+---
+
+# TypeScript Standards
+
+## Type Safety
+
+- Always use proper types from Lexical imports
+- Avoid `any` type - use `unknown` if needed
+- Define interfaces for component props
+- Use type unions for limited value sets
+
+## Common Types
+
+```tsx
+import { type LexicalEditor, type EditorState } from "lexical";
+
+interface EditorProps {
+  initialValue?: string;
+  placeholder?: string;
+  onChange?: (value: string) => void;
+  showToolbar?: boolean;
+}
+```
+
+## Naming Conventions
+
+- Components: PascalCase
+- Functions: camelCase
+- Types/Interfaces: PascalCase
+- Constants: UPPER_SNAKE_CASE
+- Files: kebab-case for components, camelCase for utilities
+
+## Import Order
+
+1. React imports
+2. External library imports
+3. Lexical imports
+4. Internal component imports
+5. Type imports (use `import type`)

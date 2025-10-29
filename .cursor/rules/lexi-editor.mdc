@@ -1,0 +1,86 @@
+---
+alwaysApply: true
+---
+
+# Lexi Text Editor Template
+
+Lexi is a rich text editor built with React 19, Lexical, TypeScript, and shadcn/ui.
+
+## Core Technologies
+
+- React 19 - UI framework
+- Lexical - Text editor framework by Meta
+- TypeScript - Type safety
+- Vite - Build tool
+- Tailwind CSS v4 - Styling
+- shadcn/ui - UI components
+- next-themes - Theme management
+
+## Key Patterns
+
+### Editor Usage
+
+Always import from `@/components/editor`:
+
+```tsx
+import { Editor } from "@/components/editor";
+
+<Editor
+  showToolbar
+  showFloatingToolbar
+  minHeight="400px"
+  placeholder='Start writing or use "/" for quick commands'
+  onChange={(content) => {}}
+/>;
+```
+
+### Lexical Editor State
+
+Always wrap state updates in `editor.update()`:
+
+```tsx
+editor.update(() => {
+  const selection = $getSelection();
+  if ($isRangeSelection(selection)) {
+    // manipulate selection
+  }
+});
+```
+
+### Toolbar Buttons
+
+Use the Toggle component for all toolbar buttons:
+
+```tsx
+import { Toggle } from "@/components/ui/toggle";
+
+<Toggle
+  pressed={isActive}
+  onPressedChange={onClick}
+  size="sm"
+  variant="outline"
+  title={title}
+  aria-label={title}
+>
+  <Icon />
+</Toggle>;
+```
+
+## Security
+
+- Always validate URLs in link dialogs
+- Only allow http:// and https:// protocols
+- Never insert raw HTML without sanitization
+
+## Performance
+
+- Use `useMemo` for expensive calculations
+- Use `useCallback` for event handlers
+- Lazy load dialogs with React.lazy
+- Set maxHistorySize to 100 for undo/redo
+
+## Accessibility
+
+- Always add aria-label to interactive elements
+- Use aria-hidden="true" for decorative icons
+- Ensure keyboard navigation works

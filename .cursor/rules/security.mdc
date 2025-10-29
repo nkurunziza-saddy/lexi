@@ -1,0 +1,44 @@
+---
+alwaysApply: true
+---
+
+# Security Guidelines
+
+## URL Validation
+
+Always validate user-provided URLs to prevent XSS:
+
+```tsx
+function isValidURL(url: string): boolean {
+  try {
+    const urlObj = new URL(url);
+    // Only allow http and https
+    if (!["http:", "https:"].includes(urlObj.protocol)) {
+      return false;
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+```
+
+## Content Sanitization
+
+- Lexical handles content sanitization automatically
+- Never insert raw HTML without validation
+- Always validate file uploads
+- Check MIME types for images
+
+## Export Security
+
+- HTML exports should be sanitized
+- Markdown exports are safe (plain text)
+- JSON exports are safe (Lexical's native format)
+
+## Input Validation
+
+- Validate all user inputs
+- Sanitize text before processing
+- Check bounds for numeric inputs
+- Validate file sizes and types

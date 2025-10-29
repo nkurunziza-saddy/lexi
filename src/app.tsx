@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Editor } from "@/components/editor";
 
 const EditorPresets = {
@@ -9,11 +8,9 @@ const EditorPresets = {
 };
 
 export default function App() {
-  const [content, setContent] = useState("");
-  console.log(content);
   return (
     <main className="min-h-screen bg-background text-foreground">
-      <Editor {...EditorPresets} onChange={setContent} />
+      <Editor {...EditorPresets} />
     </main>
   );
 }

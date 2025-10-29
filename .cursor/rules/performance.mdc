@@ -1,0 +1,58 @@
+---
+globs: src/components/**/*.tsx
+---
+
+# Performance Optimization
+
+## Memoization
+
+Use `useMemo` for expensive calculations:
+
+```tsx
+const initialConfig = useMemo(
+  () => ({
+    ...EDITOR_CONFIG,
+    editorState: initialValue ? initialValue : null,
+  }),
+  [initialValue]
+);
+```
+
+Use `useCallback` for event handlers passed to children:
+
+```tsx
+const handleChange = useCallback(
+  (editorState: EditorState) => {
+    onChange?.(editorState.toJSON());
+  },
+  [onChange]
+);
+```
+
+## Lazy Loading
+
+Lazy load heavy components like dialogs:
+
+```tsx
+const LinkDialog = lazy(() =>
+  import("../components/link-dialog").then((m) => ({ default: m.LinkDialog }))
+);
+
+<Suspense fallback={null}>{showDialog && <LinkDialog {...props} />}</Suspense>;
+```
+
+## Editor Configuration
+
+Set reasonable history limits:
+
+```tsx
+export const EDITOR_CONFIG = {
+  maxHistorySize: 100, // Prevent memory leaks
+};
+```
+
+## Re-render Optimization
+
+- Avoid creating objects/arrays in render
+- Use stable references for callbacks
+- Minimize prop drilling

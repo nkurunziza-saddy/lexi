@@ -1,0 +1,41 @@
+---
+alwaysApply: true
+---
+
+# Accessibility Standards (WCAG)
+
+## ARIA Attributes
+
+Always add proper ARIA labels to interactive elements:
+
+```tsx
+<Toggle aria-label="Bold text" aria-pressed={isBold} title="Bold (Ctrl+B)">
+  <Bold className="size-4" aria-hidden="true" />
+</Toggle>
+```
+
+## Keyboard Navigation
+
+- All functionality must be accessible via keyboard
+- Use standard shortcuts: Ctrl+B, Ctrl+I, Ctrl+U, etc.
+- Ensure focus indicators are visible
+- Use tabIndex appropriately
+
+## Screen Readers
+
+- Add descriptive aria-label to icon-only buttons
+- Use aria-hidden="true" for decorative icons
+- Provide alternative text for images
+- Use semantic HTML elements
+
+## Focus Management
+
+- Auto-focus editor on mount (configurable)
+- Return focus to editor after dialog closes
+- Manage focus in floating toolbars
+
+## Color Contrast
+
+- Ensure sufficient contrast for text
+- Don't rely solely on color to convey information
+- Support dark mode

@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Toggle } from "@/components/ui/toggle";
 import type { LucideIcon } from "lucide-react";
 
 interface Props {
@@ -11,15 +11,17 @@ interface Props {
 export function ToolbarButton({ onClick, isActive, icon: Icon, title }: Props) {
   return (
     <div>
-      <Button
-        variant={isActive ? "secondary" : "ghost"}
+      <Toggle
+        pressed={isActive}
+        onPressedChange={onClick}
         size="sm"
-        onClick={onClick}
+        variant="outline"
         title={title}
-        className="hover:bg-accent/80 transition-all duration-200"
+        aria-label={title}
+        onMouseDown={(e) => e.preventDefault()}
       >
-        <Icon className="size-4" />
-      </Button>
+        <Icon aria-hidden="true" />
+      </Toggle>
     </div>
   );
 }

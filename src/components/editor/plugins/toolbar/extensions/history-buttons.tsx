@@ -22,9 +22,11 @@ export function HistoryButtons({
           disabled={!canUndo}
           onClick={() => editor.dispatchCommand(UNDO_COMMAND, undefined)}
           title="Undo"
+          aria-label="Undo last action"
+          aria-disabled={!canUndo}
           className="hover:bg-accent/80 transition-all duration-200"
         >
-          <Undo className="size-4" />
+          <Undo className="size-4" aria-hidden="true" />
         </Button>
       </div>
       <div>
@@ -34,9 +36,11 @@ export function HistoryButtons({
           disabled={!canRedo}
           onClick={() => editor.dispatchCommand(REDO_COMMAND, undefined)}
           title="Redo"
+          aria-label="Redo last action"
+          aria-disabled={!canRedo}
           className="hover:bg-accent/80 transition-all duration-200"
         >
-          <Redo className="size-4" />
+          <Redo className="size-4" aria-hidden="true" />
         </Button>
       </div>
     </>

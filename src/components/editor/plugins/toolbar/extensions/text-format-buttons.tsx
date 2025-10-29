@@ -1,11 +1,26 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { TEXT_FORMAT_ITEMS } from "../toolbar-items";
 import { ToolbarButton } from "./toolbar-button";
+import type { LexicalCommand } from "lexical";
 
-export function TextFormatButtons({ toolbarState }: { toolbarState: any }) {
+interface ToolbarState {
+  isBold: boolean;
+  isItalic: boolean;
+  isUnderline: boolean;
+  isStrikethrough: boolean;
+  isCode: boolean;
+  blockType?: string;
+  [key: string]: boolean | string | undefined;
+}
+
+export function TextFormatButtons({
+  toolbarState,
+}: {
+  toolbarState: ToolbarState;
+}) {
   const [editor] = useLexicalComposerContext();
 
-  const handleClick = (command: any, payload?: any) => {
+  const handleClick = (command: LexicalCommand<unknown>, payload?: unknown) => {
     editor.dispatchCommand(command, payload);
   };
 
@@ -15,7 +30,11 @@ export function TextFormatButtons({ toolbarState }: { toolbarState: any }) {
         <ToolbarButton
           key={item.name}
           onClick={() => handleClick(item.command, item.payload)}
-          isActive={toolbarState[`is${item.name.charAt(0).toUpperCase() + item.name.slice(1)}`]}
+          isActive={
+            !!toolbarState[
+              `is${item.name.charAt(0).toUpperCase() + item.name.slice(1)}`
+            ]
+          }
           icon={item.icon}
           title={item.name}
         />

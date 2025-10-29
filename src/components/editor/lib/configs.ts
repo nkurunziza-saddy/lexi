@@ -10,4 +10,8 @@ export const EDITOR_CONFIG = {
   theme: EditorTheme,
   onError,
   nodes,
+  // Limit undo/redo history to prevent memory leaks
+  // ~100 states is reasonable for most use cases
+  editorState: null,
+  maxHistorySize: 100,
 };

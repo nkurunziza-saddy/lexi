@@ -1,4 +1,11 @@
-import { useState, useCallback, useEffect, useReducer } from "react";
+import {
+  useState,
+  useCallback,
+  useEffect,
+  useReducer,
+  Suspense,
+  lazy,
+} from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 
 import {
@@ -36,7 +43,6 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { LinkDialog, TableDialog, ImageDialog } from "../../components";
 import { $createImageNode } from "../../lib/nodes/image-node";
 import { HIGHLIGHT_COLORS } from "../../lib/colors";
 import { ColorPicker } from "./extensions/color-picker";
@@ -46,6 +52,23 @@ import { BlockTypeButtons } from "./extensions/block-type-buttons";
 import { $isHeadingNode, $isQuoteNode } from "@lexical/rich-text";
 import Separator from "../../components/toolbar-separator";
 import { ModeToggle } from "../../components/theme-toggler";
+
+// Lazy load dialogs to reduce initial bundle size
+const LinkDialog = lazy(() =>
+  import("../../components/link-dialog").then((m) => ({
+    default: m.LinkDialog,
+  }))
+);
+const TableDialog = lazy(() =>
+  import("../../components/table-dialog").then((m) => ({
+    default: m.TableDialog,
+  }))
+);
+const ImageDialog = lazy(() =>
+  import("../../components/image-dialog").then((m) => ({
+    default: m.ImageDialog,
+  }))
+);
 
 const initialState = {
   isBold: false,
@@ -249,7 +272,7 @@ export function Toolbar() {
   };
 
   return (
-    <div className="flex items-center gap-1 p-3 border-b bg-gradient-to-r from-background via-background to-accent/5 backdrop-blur-sm flex-wrap">
+    <div className="flex items-center gap-1 p-3 border-b bg-linear-to-r from-background via-background to-accent/5 backdrop-blur-sm flex-wrap">
       <HistoryButtons
         canUndo={toolbarState.canUndo}
         canRedo={toolbarState.canRedo}
@@ -275,9 +298,11 @@ export function Toolbar() {
               variant={toolbarState.isHighlight ? "secondary" : "ghost"}
               size="sm"
               title="Highlight"
+              aria-label="Highlight text"
+              aria-pressed={toolbarState.isHighlight}
               className="hover:bg-accent/80 transition-all duration-200"
             >
-              <Highlighter className="size-4" />
+              <Highlighter className="size-4" aria-hidden="true" />
             </Button>
           </div>
         </DropdownMenuTrigger>
@@ -327,9 +352,11 @@ export function Toolbar() {
           size="sm"
           onClick={insertLink}
           title="Insert Link"
+          aria-label="Insert link"
+          aria-pressed={toolbarState.isLink}
           className="hover:bg-accent/80 transition-all duration-200"
         >
-          <LinkIcon className="size-4" />
+          <LinkIcon className="size-4" aria-hidden="true" />
         </Button>
       </div>
 
@@ -351,32 +378,49 @@ export function Toolbar() {
 
       <AlignButtons />
 
-      <LinkDialog
-        isOpen={showLinkDialog}
-        onClose={() => setShowLinkDialog(false)}
-        onSubmit={handleLinkSubmit}
-      />
+      <Suspense fallback={null}>
+        {showLinkDialog && (
+          <LinkDialog
+            isOpen={showLinkDialog}
+            onClose={() => setShowLinkDialog(false)}
+            onSubmit={handleLinkSubmit}
+          />
+        )}
+      </Suspense>
 
-      <TableDialog
-        isOpen={showTableDialog}
-        onClose={() => setShowTableDialog(false)}
-        onSubmit={handleTableSubmit}
-      />
+      <Suspense fallback={null}>
+        {showTableDialog && (
+          <TableDialog
+            isOpen={showTableDialog}
+            onClose={() => setShowTableDialog(false)}
+            onSubmit={handleTableSubmit}
+          />
+        )}
+      </Suspense>
 
-      <ImageDialog
-        isOpen={showImageDialog}
-        onClose={() => setShowImageDialog(false)}
-        onSubmit={handleImageSubmit}
-      />
+      <Suspense fallback={null}>
+        {showImageDialog && (
+          <ImageDialog
+            isOpen={showImageDialog}
+            onClose={() => setShowImageDialog(false)}
+            onSubmit={handleImageSubmit}
+          />
+        )}
+      </Suspense>
 
       <Separator />
 
       <FileActions />
       <div className="ml-auto">
         <ModeToggle />
-        <Button size={"sm"} variant={"ghost"}>
-          <a target="_blank" href="https://github.com/nkurunziza-saddy/lexi">
-            <Github className="size-4" />
+        <Button size={"sm"} variant={"ghost"} asChild>
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://github.com/nkurunziza-saddy/lexi"
+            aria-label="View on GitHub"
+          >
+            <Github className="size-4" aria-hidden="true" />
           </a>
         </Button>
       </div>

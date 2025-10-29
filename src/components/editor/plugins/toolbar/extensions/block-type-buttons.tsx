@@ -2,15 +2,26 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import { $createCodeNode } from "@lexical/code";
 import { $createQuoteNode } from "@lexical/rich-text";
 import { $setBlocksType } from "@lexical/selection";
-import { $createParagraphNode, $getSelection, $isRangeSelection } from "lexical";
+import {
+  $createParagraphNode,
+  $getSelection,
+  $isRangeSelection,
+} from "lexical";
 import { BLOCK_FORMAT_ITEMS } from "../toolbar-items";
 import { ToolbarButton } from "./toolbar-button";
 
-const BLOCK_TYPE_ITEMS = BLOCK_FORMAT_ITEMS.filter(
-  (item) => item.format
-);
+const BLOCK_TYPE_ITEMS = BLOCK_FORMAT_ITEMS.filter((item) => item.format);
 
-export function BlockTypeButtons({ toolbarState }: { toolbarState: any }) {
+interface ToolbarState {
+  blockType: string;
+  [key: string]: boolean | string;
+}
+
+export function BlockTypeButtons({
+  toolbarState,
+}: {
+  toolbarState: ToolbarState;
+}) {
   const [editor] = useLexicalComposerContext();
 
   const onClickHandler = (format: string) => {

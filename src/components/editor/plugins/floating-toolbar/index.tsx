@@ -20,6 +20,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { useCallback, useMemo } from "react";
+import { Toggle } from "@/components/ui/toggle";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -30,15 +31,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useFloatingToolbar } from "../../lib/hooks/use-floating-toolbar";
 import Separator from "../../components/toolbar-separator";
-
-const HIGHLIGHT_COLORS = [
-  { name: "Yellow", value: "#fef08a" },
-  { name: "Green", value: "#bbf7d0" },
-  { name: "Blue", value: "#bfdbfe" },
-  { name: "Purple", value: "#e9d5ff" },
-  { name: "Pink", value: "#fce7f3" },
-  { name: "Orange", value: "#fed7aa" },
-];
+import { HIGHLIGHT_COLORS } from "../../lib/colors";
 
 interface FormatItem {
   name: string;
@@ -83,25 +76,18 @@ function ToolbarButton({
   disabled,
 }: ToolbarButtonProps) {
   return (
-    <Button
-      variant="ghost"
+    <Toggle
+      pressed={isActive}
+      onPressedChange={onClick}
       size="sm"
-      className={`
-        h-8 w-8 p-0 transition-all duration-150
-        ${
-          isActive
-            ? "bg-primary text-primary-foreground shadow-sm"
-            : "hover:bg-muted"
-        }
-        ${disabled ? "opacity-50 cursor-not-allowed" : ""}
-      `}
-      onClick={onClick}
+      variant="outline"
       disabled={disabled}
       title={title}
+      aria-label={title}
       onMouseDown={(e) => e.preventDefault()}
     >
-      <Icon className="size-4" />
-    </Button>
+      <Icon aria-hidden="true" />
+    </Toggle>
   );
 }
 

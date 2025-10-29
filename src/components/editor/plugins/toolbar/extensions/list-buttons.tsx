@@ -6,7 +6,12 @@ const LIST_ITEMS = BLOCK_FORMAT_ITEMS.filter(
   (item) => item.command && ["bullet", "number", "check"].includes(item.name)
 );
 
-export function ListButtons({ toolbarState }: { toolbarState: any }) {
+interface ToolbarState {
+  blockType: string;
+  [key: string]: boolean | string;
+}
+
+export function ListButtons({ toolbarState }: { toolbarState: ToolbarState }) {
   const [editor] = useLexicalComposerContext();
 
   return (

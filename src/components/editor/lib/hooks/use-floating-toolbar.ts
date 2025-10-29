@@ -164,7 +164,7 @@ export function useFloatingToolbar(): UseFloatingToolbarReturn {
         clearTimeout(timeoutRef.current);
       }
     };
-  }, [editor, isVisible, updateToolbar]);
+  }, [editor, isVisible, updateToolbar, calculatePosition]);
 
   useEffect(() => {
     return mergeRegister(

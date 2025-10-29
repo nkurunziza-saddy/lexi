@@ -12,6 +12,7 @@ import {
 import {
   exportAsHTML,
   exportAsMarkdown,
+  exportAsJSON,
   copyAsPlainText,
   importMarkdown,
 } from "../../../lib/utils";
@@ -57,6 +58,12 @@ export function FileActions() {
             className="hover:bg-accent/80 transition-colors"
           >
             Save as Markdown
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => exportAsJSON(editor)}
+            className="hover:bg-accent/80 transition-colors"
+          >
+            Save as JSON
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => copyAsPlainText(editor)}

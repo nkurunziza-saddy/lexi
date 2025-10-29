@@ -1,0 +1,53 @@
+---
+globs: src/components/editor/plugins/**/*.tsx
+---
+
+# Lexical Editor Plugins
+
+Editor plugins extend functionality using Lexical's plugin system.
+
+## Plugin Structure
+
+All plugins use `useLexicalComposerContext()`:
+
+```tsx
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+
+export function MyPlugin() {
+  const [editor] = useLexicalComposerContext();
+
+  useEffect(() => {
+    return editor.registerCommand(
+      COMMAND_TYPE,
+      (payload) => {
+        // handle command
+        return false;
+      },
+      COMMAND_PRIORITY_LOW
+    );
+  }, [editor]);
+
+  return <div>...</div>;
+}
+```
+
+## Commands
+
+Always dispatch commands for cross-component communication:
+
+```tsx
+editor.dispatchCommand(TOGGLE_LINK_COMMAND, url);
+```
+
+## State Management
+
+- Toolbar state uses useReducer
+- Selection state managed by Lexical
+- No global state management needed
+
+## Available Plugins
+
+- Toolbar - Main formatting toolbar
+- FloatingToolbar - Context-aware selection toolbar
+- SlashCommand - Typeahead menu
+- TableHoverActions - Table controls

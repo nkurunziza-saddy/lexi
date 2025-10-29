@@ -1,5 +1,5 @@
 import type React from "react";
-import { useState, useCallback } from "react";
+import { useCallback, useMemo } from "react";
 
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
@@ -119,20 +119,19 @@ export function Editor({
   onChange,
   plugins = [],
 }: EditorProps) {
-  const [_, setEditorState] = useState<string>(initialValue);
-
-  const initialConfig = {
-    ...EDITOR_CONFIG,
-    editorState: initialValue ? initialValue : null,
-    editable: !readOnly,
-  };
+  const initialConfig = useMemo(
+    () => ({
+      ...EDITOR_CONFIG,
+      editorState: initialValue ? initialValue : null,
+      editable: !readOnly,
+    }),
+    [initialValue, readOnly]
+  );
 
   const handleEditorChange = useCallback(
-    (editorState: any) => {
+    (editorState: EditorState) => {
       const jsonState = editorState.toJSON();
       const jsonString = JSON.stringify(jsonState);
-
-      setEditorState(jsonString);
       onChange?.(jsonString);
     },
     [onChange]

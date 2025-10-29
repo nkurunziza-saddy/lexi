@@ -1,0 +1,39 @@
+---
+globs: src/components/ui/*.tsx,src/components/ui/*.ts
+---
+
+# UI Component Library (shadcn/ui)
+
+Lexi uses minimal shadcn/ui components. Only these components exist:
+
+- button.tsx - Button component
+- toggle.tsx - Toggle for toolbar buttons
+- dialog.tsx - Modal dialogs
+- dropdown-menu.tsx - Dropdown menus
+- input.tsx - Text input
+- label.tsx - Form labels
+- separator.tsx - Visual separator
+
+All components use Radix UI primitives with Tailwind CSS styling.
+
+## Component Usage
+
+Always use proper props and accessibility attributes:
+
+```tsx
+<Toggle
+  pressed={isActive}
+  onPressedChange={onClick}
+  size="sm"
+  variant="outline"
+  aria-label="Description"
+>
+  <Icon />
+</Toggle>
+```
+
+## Styling
+
+- Use Tailwind utility classes
+- Follow shadcn/ui patterns
+- Maintain consistency with existing components
