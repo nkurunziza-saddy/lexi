@@ -80,7 +80,6 @@ function ToolbarButton({
       pressed={isActive}
       onPressedChange={onClick}
       size="sm"
-      variant="outline"
       disabled={disabled}
       title={title}
       aria-label={title}
