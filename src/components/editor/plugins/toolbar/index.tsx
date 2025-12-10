@@ -8,11 +8,15 @@ import { $isTableCellNode, INSERT_TABLE_COMMAND } from "@lexical/table";
 import {
   $findMatchingParent,
   $getNearestNodeOfType,
+  $wrapNodeInElement,
   mergeRegister,
 } from "@lexical/utils";
 import {
+  $createParagraphNode,
   $getSelection,
+  $insertNodes,
   $isRangeSelection,
+  $isRootOrShadowRoot,
   CAN_REDO_COMMAND,
   CAN_UNDO_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
@@ -30,6 +34,10 @@ import {
   MenuTrigger,
 } from "@/components/ui/menu";
 import { ImageDialog, LinkPopover, TableDialog } from "../../components";
+import { InsertEquationDialog } from "../../plugins/equations";
+import ExcalidrawModal from "../../components/excalidraw-modal";
+import type { AppState } from "@excalidraw/excalidraw/types";
+import { $createExcalidrawNode } from "../../nodes/excalidraw";
 import Separator from "../../components/toolbar-separator";
 import { HIGHLIGHT_COLORS } from "../../lib/colors";
 import { $createImageNode } from "../../lib/nodes/image-node";
@@ -100,6 +108,8 @@ export function Toolbar({
   const [showLinkDialog, setShowLinkDialog] = useState(false);
   const [showTableDialog, setShowTableDialog] = useState(false);
   const [showImageDialog, setShowImageDialog] = useState(false);
+  const [showEquationDialog, setShowEquationDialog] = useState(false);
+  const [showExcalidrawModal, setShowExcalidrawModal] = useState(false);
   const { isListening: isSpeechToTextActive } = useSpeechToTextState();
 
   const updateToolbar = useCallback(() => {
@@ -347,6 +357,8 @@ export function Toolbar({
       <InsertDropDown
         setShowImageDialog={setShowImageDialog}
         setShowTableDialog={setShowTableDialog}
+        setShowEquationDialog={setShowEquationDialog}
+        setShowExcalidrawModal={setShowExcalidrawModal}
       />
 
       {toolbarState.isTable && (
@@ -390,6 +402,50 @@ export function Toolbar({
         onClose={() => setShowImageDialog(false)}
         onSubmit={handleImageSubmit}
       />
+
+      {showEquationDialog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="w-full max-w-md rounded-lg border bg-popover shadow-lg">
+            <InsertEquationDialog
+              activeEditor={editor}
+              onClose={() => setShowEquationDialog(false)}
+            />
+          </div>
+        </div>
+      )}
+
+      {showExcalidrawModal && (
+        <ExcalidrawModal
+          initialElements={[]}
+          initialAppState={{} as AppState}
+          initialFiles={{}}
+          isShown={showExcalidrawModal}
+          onDelete={() => setShowExcalidrawModal(false)}
+          onClose={() => setShowExcalidrawModal(false)}
+          onSave={(elements, appState, files) => {
+            editor.update(() => {
+              const excalidrawNode = $createExcalidrawNode();
+              excalidrawNode.setData(
+                JSON.stringify({
+                  appState,
+                  elements,
+                  files,
+                })
+              );
+              $insertNodes([excalidrawNode]);
+              if ($isRootOrShadowRoot(excalidrawNode.getParentOrThrow())) {
+                $wrapNodeInElement(
+                  excalidrawNode,
+                  $createParagraphNode
+                ).selectEnd();
+              }
+            });
+
+            setShowExcalidrawModal(false);
+          }}
+          closeOnClickOutside={false}
+        />
+      )}
 
       <Separator />
 

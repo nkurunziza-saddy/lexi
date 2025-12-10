@@ -25,6 +25,8 @@ import TableHoverActionsPlugin from "./plugins/table-hover-actions";
 import SpeechToTextPlugin from "./plugins/speech-to-text";
 import { Toolbar } from "./plugins/toolbar";
 import { debounce } from "./lib/debounce";
+import EquationsPlugin from "./plugins/equations";
+import ExcalidrawPlugin from "./plugins/excalidraw";
 
 function EditorContent({
   placeholder = "Start writing ...",
@@ -114,6 +116,8 @@ function EditorPlugins({
       />
       <TableHoverActionsPlugin />
       <SlashCommandPlugin />
+      <EquationsPlugin />
+      <ExcalidrawPlugin />
       {enableSpeechToText && <SpeechToTextPlugin />}
       <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
       <OnChangePlugin onChange={onChange} />

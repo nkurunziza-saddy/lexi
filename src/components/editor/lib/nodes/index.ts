@@ -5,6 +5,8 @@ import { HorizontalRuleNode } from "@lexical/react/LexicalHorizontalRuleNode";
 import { HeadingNode, QuoteNode } from "@lexical/rich-text";
 import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
 import { ImageNode } from "./image-node";
+import { EquationNode } from "../../nodes/equation/equation-node";
+import { ExcalidrawNode } from "../../nodes/excalidraw";
 
 export const nodes = [
   HeadingNode,
@@ -20,4 +22,6 @@ export const nodes = [
   TableCellNode,
   TableRowNode,
   ImageNode,
+  EquationNode,
+  ExcalidrawNode,
 ];

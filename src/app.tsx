@@ -7,7 +7,7 @@ function App() {
       showFloatingToolbar
       enableSpeechToText
       placeholder="Start writing..."
-      onChange={(value) => console.log(value)}
+      // onChange={(value) => console.log(value)}
     />
   );
 }

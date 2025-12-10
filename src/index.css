@@ -166,3 +166,104 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* ===== Excalidraw Theme Customization ===== */
+
+/* Light theme - Excalidraw CSS variables */
+.excalidraw {
+  --color-primary: oklch(0.205 0 0);
+  --color-primary-darker: oklch(0.15 0 0);
+  --color-primary-darkest: oklch(0.1 0 0);
+  --color-primary-light: oklch(0.97 0 0);
+  --color-primary-contrast-offset: oklch(0.985 0 0);
+  --color-surface-primary-container: oklch(0.97 0 0);
+  --color-surface-low: oklch(0.985 0 0);
+  --color-surface-mid: oklch(0.97 0 0);
+  --color-surface-high: oklch(0.95 0 0);
+  --color-on-surface: oklch(0.145 0 0);
+  --color-on-primary-container: oklch(0.145 0 0);
+  --color-brand-hover: oklch(0.3 0 0);
+  --color-brand-active: oklch(0.25 0 0);
+  --island-bg-color: oklch(1 0 0);
+  --default-bg-color: oklch(1 0 0);
+  --popup-bg-color: oklch(1 0 0);
+  --popup-secondary-bg-color: oklch(0.97 0 0);
+  --text-primary-color: oklch(0.145 0 0);
+  --border-radius-lg: 0.625rem;
+  --border-radius-md: 0.5rem;
+  --shadow-island: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Dark theme - Excalidraw CSS variables */
+.excalidraw.theme--dark {
+  --color-primary: oklch(0.922 0 0);
+  --color-primary-darker: oklch(0.85 0 0);
+  --color-primary-darkest: oklch(0.75 0 0);
+  --color-primary-light: oklch(0.269 0 0);
+  --color-primary-contrast-offset: oklch(0.205 0 0);
+  --color-surface-primary-container: oklch(0.269 0 0);
+  --color-surface-low: oklch(0.18 0 0);
+  --color-surface-mid: oklch(0.22 0 0);
+  --color-surface-high: oklch(0.28 0 0);
+  --color-on-surface: oklch(0.985 0 0);
+  --color-on-primary-container: oklch(0.985 0 0);
+  --color-brand-hover: oklch(0.8 0 0);
+  --color-brand-active: oklch(0.7 0 0);
+  --island-bg-color: oklch(0.205 0 0);
+  --default-bg-color: oklch(0.145 0 0);
+  --popup-bg-color: oklch(0.205 0 0);
+  --popup-secondary-bg-color: oklch(0.269 0 0);
+  --text-primary-color: oklch(0.985 0 0);
+  --shadow-island: 0 4px 6px -1px rgba(0, 0, 0, 0.3),
+    0 2px 4px -1px rgba(0, 0, 0, 0.2);
+}
+
+/* Excalidraw container styling */
+.excalidraw .layer-ui__wrapper {
+  border-radius: var(--border-radius-lg);
+}
+
+/* Excalidraw toolbar styling */
+.excalidraw .Island {
+  border-radius: var(--border-radius-lg) !important;
+  border: 1px solid var(--color-surface-high);
+}
+
+/* Button styling in Excalidraw */
+.excalidraw button,
+.excalidraw .ToolIcon_type_button {
+  border-radius: var(--border-radius-md) !important;
+}
+
+/* Dialog/Modal styling */
+.excalidraw .Modal,
+.excalidraw .Dialog {
+  border-radius: var(--border-radius-lg) !important;
+  border: 1px solid var(--color-surface-high);
+}
+
+/* Input styling */
+.excalidraw input,
+.excalidraw select,
+.excalidraw textarea {
+  border-radius: var(--border-radius-md) !important;
+}
+
+.excalidraw ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.excalidraw ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.excalidraw ::-webkit-scrollbar-thumb {
+  background: var(--color-surface-high);
+  border-radius: 4px;
+}
+
+.excalidraw ::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary-light);
+}

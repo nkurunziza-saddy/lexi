@@ -2,3 +2,8 @@ export * from "./image-dialog";
 export * from "./link-dialog";
 export * from "./link-popover";
 export * from "./table-dialog";
+export * from "./excalidraw-modal";
+export * from "./equation-editor";
+export * from "./image-resizer";
+export * from "./katex-equation-alterer";
+export * from "./katex-renderer";

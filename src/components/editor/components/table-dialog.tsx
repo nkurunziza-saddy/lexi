@@ -55,7 +55,7 @@ export function TableDialog({
                       min="1"
                       onChange={(e) =>
                         setRows(
-                          Math.max(1, Number.parseInt(e.target.value) || 1),
+                          Math.max(1, Number.parseInt(e.target.value) || 1)
                         )
                       }
                       type="number"
@@ -73,7 +73,7 @@ export function TableDialog({
                       min="1"
                       onChange={(e) =>
                         setColumns(
-                          Math.max(1, Number.parseInt(e.target.value) || 1),
+                          Math.max(1, Number.parseInt(e.target.value) || 1)
                         )
                       }
                       type="number"
