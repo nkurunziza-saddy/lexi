@@ -38,7 +38,7 @@ import { InsertEquationDialog } from "../../plugins/equations";
 import ExcalidrawModal from "../../components/excalidraw-modal";
 import type { AppState } from "@excalidraw/excalidraw/types";
 import { $createExcalidrawNode } from "../../nodes/excalidraw";
-import Separator from "../../components/toolbar-separator";
+import { Separator } from "../../components/toolbar-separator";
 import { HIGHLIGHT_COLORS } from "../../lib/colors";
 import { $createImageNode } from "../../lib/nodes/image-node";
 import { AlignButtons } from "./extensions/align-buttons";

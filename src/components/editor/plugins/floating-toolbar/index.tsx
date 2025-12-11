@@ -27,7 +27,7 @@ import {
   MenuSeparator,
   MenuTrigger,
 } from "@/components/ui/menu";
-import Separator from "../../components/toolbar-separator";
+import { Separator } from "../../components/toolbar-separator";
 import { HIGHLIGHT_COLORS } from "../../lib/colors";
 import { useFloatingToolbar } from "../../lib/hooks/use-floating-toolbar";
 import {
@@ -72,7 +72,7 @@ export function FloatingToolbar() {
       editor.dispatchCommand(FORMAT_TEXT_COMMAND, format as TextFormatType);
       editor.focus();
     },
-    [editor],
+    [editor]
   );
 
   const formatHighlight = useCallback(
@@ -87,18 +87,15 @@ export function FloatingToolbar() {
       });
       editor.focus();
     },
-    [editor],
+    [editor]
   );
 
   const groupedItems = useMemo(() => {
-    const groups = FORMAT_ITEMS.reduce(
-      (acc, item) => {
-        if (!acc[item.group]) acc[item.group] = [];
-        acc[item.group].push(item);
-        return acc;
-      },
-      {} as Record<string, FormatItem[]>,
-    );
+    const groups = FORMAT_ITEMS.reduce((acc, item) => {
+      if (!acc[item.group]) acc[item.group] = [];
+      acc[item.group].push(item);
+      return acc;
+    }, {} as Record<string, FormatItem[]>);
 
     return groups;
   }, []);
@@ -113,7 +110,9 @@ export function FloatingToolbar() {
         top: `${position.top}px`,
         left: `${position.left}px`,
         opacity: position.opacity,
-        transform: `translateZ(0) ${position.opacity === 1 ? "scale(1)" : "scale(0.95)"}`,
+        transform: `translateZ(0) ${
+          position.opacity === 1 ? "scale(1)" : "scale(0.95)"
+        }`,
         pointerEvents: position.opacity > 0 ? "auto" : "none",
       }}
     >
@@ -200,6 +199,6 @@ export function FloatingToolbar() {
         </>
       )}
     </div>,
-    document.body,
+    document.body
   );
 }

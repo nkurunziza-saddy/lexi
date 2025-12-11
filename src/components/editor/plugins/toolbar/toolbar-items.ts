@@ -6,7 +6,6 @@ import {
 import { FORMAT_TEXT_COMMAND } from "lexical";
 import {
   Bold,
-  CaseUpper,
   Code,
   CodeSquare,
   Italic,

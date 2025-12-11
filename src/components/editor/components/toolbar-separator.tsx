@@ -14,4 +14,4 @@ const Separator = ({ orientation = "vertical" }: Props) => {
   );
 };
 
-export default Separator;
+export { Separator };
