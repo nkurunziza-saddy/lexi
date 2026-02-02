@@ -20,12 +20,13 @@ function App() {
 
   // Ensure there is at least one note on first load if store is empty
   useEffect(() => {
-    if (notes.length === 0) {
+    // Check the actual store state to avoid closure staleness in Strict Mode
+    if (useNotesStore.getState().notes.length === 0) {
       addNote();
     } else if (!activeNoteId) {
-      setActiveNote(notes[0].id);
+      setActiveNote(useNotesStore.getState().notes[0].id);
     }
-  }, [notes.length, activeNoteId, addNote, setActiveNote]);
+  }, [activeNoteId, addNote, setActiveNote]);
 
   const handleChange = useCallback(
     (value: string) => {

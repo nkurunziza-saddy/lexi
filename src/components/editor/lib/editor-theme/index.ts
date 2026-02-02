@@ -4,19 +4,19 @@ export const theme: EditorThemeClasses = {
   ltr: "text-left",
   rtl: "text-right",
 
-  paragraph: "m-0 mb-2 leading-relaxed relative will-change-auto",
+  paragraph: "m-0 mt-5 first:mt-0 leading-relaxed relative",
 
   heading: {
-    h1: "text-3xl font-bold my-4 text-foreground will-change-auto",
-    h2: "text-2xl font-semibold my-3 text-foreground/95 will-change-auto",
-    h3: "text-xl font-medium my-3 text-foreground/90 will-change-auto",
-    h4: "text-lg font-medium my-2 text-foreground/85 will-change-auto",
-    h5: "text-base font-medium my-2 text-foreground/80 will-change-auto",
-    h6: "text-sm font-medium my-2 text-foreground/80 will-change-auto",
+    h1: "text-3xl font-bold mt-12 mb-4 text-foreground",
+    h2: "text-2xl font-bold mt-10 mb-3 text-foreground",
+    h3: "text-xl font-semibold mt-8 mb-3 text-foreground",
+    h4: "text-lg font-semibold mt-8 mb-2 text-foreground",
+    h5: "text-base font-semibold mt-8 mb-2 text-foreground",
+    h6: "text-sm font-semibold mt-8 mb-2 text-foreground",
   },
 
   quote:
-    "ml-4 my-3 border-l-4 border-muted-foreground/30 pl-4 text-muted-foreground italic bg-muted/20 py-2 rounded-r will-change-auto",
+    "pl-4 py-1.5 my-6 border-l-4 border-muted-foreground/30 text-muted-foreground italic bg-muted/20 rounded-r will-change-auto",
 
   list: {
     nested: {
@@ -29,32 +29,32 @@ export const theme: EditorThemeClasses = {
       "list-[upper-roman] list-outside ml-6",
       "list-[lower-roman] list-outside ml-6",
     ],
-    ol: "list-decimal list-outside my-2 ml-6 space-y-1",
-    ul: "list-disc list-outside my-2 ml-6 space-y-1",
-    listitem: "pl-2",
+    ol: "list-decimal list-outside my-6 ml-6 space-y-1",
+    ul: "list-disc list-outside my-6 ml-6 space-y-1",
+    listitem: "pl-2 leading-relaxed",
     listitemChecked:
-      "relative flex items-center gap-2 list-none outline-none text-muted-foreground before:content-[''] before:flex-shrink-0 before:mt-0.5 before:size-4 before:rounded before:border before:border-primary before:bg-primary before:cursor-pointer before:flex before:items-center before:justify-center before:[content:'✓'] before:text-primary-foreground before:text-sm before:font-medium [&>span]:line-through",
+      "relative flex items-center gap-2 list-none outline-none text-muted-foreground/50 line-through before:content-[''] before:flex-shrink-0 before:mt-1 before:size-4 before:rounded-[0.25rem] before:border before:border-foreground before:bg-foreground before:cursor-pointer before:flex before:items-center before:justify-center before:[content:'✓'] before:text-background before:text-xs before:font-bold",
     listitemUnchecked:
-      "relative flex items-center gap-2 list-none outline-none before:content-[''] before:flex-shrink-0 before:mt-0.5 before:size-4 before:rounded before:border before:border-border/50 before:bg-muted before:cursor-pointer hover:before:border-border/70",
-    checklist: "my-2 space-y-2",
+      "relative flex items-center gap-2 list-none outline-none before:content-[''] before:flex-shrink-0 before:mt-1 before:size-4 before:rounded-[0.25rem] before:border before:border-border before:bg-muted before:cursor-pointer hover:before:border-foreground/50 transition-colors duration-80",
+    checklist: "my-6 space-y-2 pl-1",
   },
 
   text: {
     bold: "font-bold",
     capitalize: "capitalize",
-    code: "bg-muted/90 dark:bg-muted/70 mx-0.5 px-1.5 py-0.5 rounded text-sm font-mono border border-border/50 text-foreground/90",
+    code: "bg-muted text-foreground border border-border mx-0.5 px-1 py-0.5 rounded-[0.375rem] text-[0.875em] font-mono leading-snug",
     highlight: "bg-yellow-200/40 dark:bg-yellow-900/30 px-1 rounded",
     italic: "italic",
     lowercase: "lowercase",
     strikethrough: "line-through opacity-70",
     subscript: "text-xs align-sub",
     superscript: "text-xs align-super",
-    underline: "underline decoration-2 underline-offset-2",
+    underline: "underline decoration-auto underline-offset-auto",
     underlineStrikethrough: "underline line-through opacity-70",
     uppercase: "uppercase",
   },
 
-  code: "relative block bg-muted/50 dark:bg-muted/30 rounded-lg overflow-x-auto my-4 text-sm leading-relaxed px-4 py-3 font-mono border border-border/50",
+  code: "relative block bg-muted/80 dark:bg-muted/60 rounded-md overflow-x-auto my-4 text-sm leading-relaxed px-4 py-3 font-mono border border-border/50",
   codeHighlight: {
     atrule: "text-blue-600 dark:text-blue-400",
     attr: "text-blue-600 dark:text-blue-400",
@@ -91,41 +91,41 @@ export const theme: EditorThemeClasses = {
     variable: "text-yellow-600 dark:text-yellow-400",
   },
 
-  link: "text-editor-accent hover:text-editor-primary/80 underline decoration-primary/50 hover:decoration-editor-primary transition-colors duration-200 cursor-pointer",
+  link: "text-editor-link underline cursor-pointer",
 
   table:
-    "border-collapse table-fixed w-full max-w-[80vw] my-4 border border-border rounded-lg overflow-hidden",
+    "border-collapse table-fixed w-full max-w-full my-8 border border-editor-border rounded-md overflow-hidden border-separate border-spacing-0 [&_tr:last-child_td]:border-b-0 [&_tr:last-child_th]:border-b-0",
   tableAddColumns:
-    "absolute h-full w-5 top-0 -right-5 bg-editor-muted/70 hover:bg-editor-muted cursor-pointer border-0 rounded transition-all duration-200 opacity-0 hover:opacity-100 after:content-['+'] after:absolute after:flex after:items-center after:justify-center after:w-full after:h-full after:text-editor-muted-foreground after:text-lg after:font-bold",
+    "absolute h-full w-5 top-0 -right-5 hover:bg-editor-muted cursor-pointer border-0 rounded transition-all duration-200 opacity-0 hover:opacity-100 after:content-['+'] after:absolute after:flex after:items-center after:justify-center after:w-full after:h-full after:text-editor-muted-foreground after:text-lg after:font-bold",
   tableAddRows:
-    "absolute w-full h-5 left-0 -bottom-5 bg-editor-muted/70 hover:bg-editor-muted cursor-pointer border-0 rounded transition-all duration-200 opacity-0 hover:opacity-100 after:content-['+'] after:absolute after:flex after:items-center after:justify-center after:w-full after:h-full after:text-editor-muted-foreground after:text-lg after:font-bold",
+    "absolute w-full h-5 left-0 -bottom-5 hover:bg-editor-muted cursor-pointer border-0 rounded transition-all duration-200 opacity-0 hover:opacity-100 after:content-['+'] after:absolute after:flex after:items-center after:justify-center after:w-full after:h-full after:text-editor-muted-foreground after:text-lg after:font-bold",
   tableAlignment: {
     center: "mx-auto",
     right: "ml-auto",
   },
   tableCell:
-    "border border-editor-border/60 p-3 align-top text-left relative outline-none overflow-auto min-w-[7.5rem] bg-editor-background md:min-w-[5rem] md:p-2 md:text-sm",
+    "border-b border-r border-editor-border last:border-r-0 p-3 align-top text-left relative outline-none overflow-auto min-w-[7.5rem] md:min-w-[5rem] md:p-2 md:text-sm [&_p]:mt-0",
   tableCellActionButton:
     "absolute top-0 right-0 z-10 w-6 h-6 bg-editor-background border border-editor-border rounded-bl hover:bg-editor-muted transition-colors duration-200 flex items-center justify-center text-xs text-editor-muted-foreground hover:text-editor-foreground cursor-pointer opacity-0 group-hover:opacity-100",
   tableCellActionButtonContainer:
     "absolute top-0 right-0 w-6 h-6 pointer-events-auto",
   tableCellHeader:
-    "bg-editor-muted/30 font-semibold text-editor-foreground border-b-2 border-editor-border",
+    "border-b border-r border-editor-border last:border-r-0 p-3 align-top text-left relative outline-none overflow-auto min-w-[7.5rem] md:min-w-[5rem] md:p-2 md:text-sm font-normal [&_p]:mt-0",
   tableCellResizer:
     "absolute right-0 top-0 h-full w-1 bg-transparent cursor-col-resize hover:bg-editor-primary/50 transition-colors duration-200",
   tableCellSelected: "bg-editor-primary/10 outline-2 outline-editor-primary",
   tableFrozenColumn:
-    "sticky left-0 z-20 bg-editor-background border-r-2 border-editor-border shadow-sm",
+    "sticky left-0 z-20 bg-editor-background border border-editor-border",
   tableFrozenRow:
-    "sticky top-0 z-10 bg-editor-background border-b-2 border-editor-border shadow-sm",
-  tableRowStriping: "even:bg-editor-muted/20 odd:bg-editor-background",
+    "sticky top-0 z-10 bg-editor-background border border-editor-border",
+  tableRowStriping: "",
   tableScrollableWrapper:
-    "overflow-x-auto border border-editor-border rounded-lg my-0 mb-6",
+    "overflow-x-auto border border-editor-border rounded-md my-0 mb-6",
   tableSelected: "outline-2 outline-editor-primary",
   tableSelection:
     "bg-editor-primary/10 border-2 border-editor-primary/50 rounded",
 
-  hr: "my-4 border relative after:content-[''] after:block",
+  hr: "my-9 border-none h-px bg-border",
   hrSelected: "outline-2 outline-primary rounded select-none",
 
   hashtag:
@@ -146,7 +146,7 @@ export const theme: EditorThemeClasses = {
 
   layoutContainer: "grid gap-4 my-4",
   layoutItem:
-    "border border-dashed border-border p-4 min-w-0 max-w-full rounded-lg",
+    "border border-dashed border-border p-4 min-w-0 max-w-full rounded-md",
 
   autocomplete: "text-editor-muted-foreground bg-muted/50 px-2 py-1 rounded",
 
@@ -155,7 +155,8 @@ export const theme: EditorThemeClasses = {
   specialText:
     "bg-yellow-300/60 dark:bg-yellow-900/40 text-yellow-900 dark:text-yellow-100 px-1 rounded font-medium",
 
-  image: "max-w-full h-auto rounded-lg my-4 shadow-sm",
+  image:
+    "max-w-full h-auto rounded-[0.25rem] my-8 transition-[outline] outline-[3px] outline-transparent",
   inlineImage: "inline-block max-h-6 rounded",
 };
 
