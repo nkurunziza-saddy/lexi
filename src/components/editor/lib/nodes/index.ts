@@ -7,6 +7,8 @@ import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
 import { ImageNode } from "./image-node";
 import { EquationNode } from "../../nodes/equation/equation-node";
 import { ExcalidrawNode } from "../../nodes/excalidraw";
+import { LayoutContainerNode } from "../../nodes/layout-container";
+import { LayoutItemNode } from "../../nodes/layout-item";
 
 export const nodes = [
   HeadingNode,
@@ -24,4 +26,6 @@ export const nodes = [
   ImageNode,
   EquationNode,
   ExcalidrawNode,
+  LayoutContainerNode,
+  LayoutItemNode,
 ];

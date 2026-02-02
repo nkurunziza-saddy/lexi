@@ -33,7 +33,13 @@ import {
   MenuSeparator,
   MenuTrigger,
 } from "@/components/ui/menu";
-import { ImageDialog, LinkPopover, TableDialog } from "../../components";
+import {
+  ImageDialog,
+  LayoutDialog,
+  LinkPopover,
+  TableDialog,
+} from "../../components";
+import { INSERT_LAYOUT_COMMAND } from "../layout";
 import { InsertEquationDialog } from "../../plugins/equations";
 import ExcalidrawModal from "../../components/excalidraw-modal";
 import type { AppState } from "@excalidraw/excalidraw/types";
@@ -110,6 +116,7 @@ export function Toolbar({
   const [showTableDialog, setShowTableDialog] = useState(false);
   const [showImageDialog, setShowImageDialog] = useState(false);
   const [showEquationDialog, setShowEquationDialog] = useState(false);
+  const [showLayoutDialog, setShowLayoutDialog] = useState(false);
   const [showExcalidrawModal, setShowExcalidrawModal] = useState(false);
   const { isListening: isSpeechToTextActive } = useSpeechToTextState();
 
@@ -269,6 +276,10 @@ export function Toolbar({
     });
   };
 
+  const handleLayoutSubmit = (template: string) => {
+    editor.dispatchCommand(INSERT_LAYOUT_COMMAND, template);
+  };
+
   return (
     <div className="flex relative items-center gap-1 p-3 border-b flex-wrap">
       <HistoryButtons
@@ -362,6 +373,7 @@ export function Toolbar({
         setShowImageDialog={setShowImageDialog}
         setShowTableDialog={setShowTableDialog}
         setShowEquationDialog={setShowEquationDialog}
+        setShowLayoutDialog={setShowLayoutDialog}
         setShowExcalidrawModal={setShowExcalidrawModal}
       />
 
@@ -398,6 +410,12 @@ export function Toolbar({
         isOpen={showImageDialog}
         onClose={() => setShowImageDialog(false)}
         onSubmit={handleImageSubmit}
+      />
+
+      <LayoutDialog
+        isOpen={showLayoutDialog}
+        onClose={() => setShowLayoutDialog(false)}
+        onSubmit={handleLayoutSubmit}
       />
 
       {showEquationDialog && (

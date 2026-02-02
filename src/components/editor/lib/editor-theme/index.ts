@@ -7,16 +7,16 @@ export const theme: EditorThemeClasses = {
   paragraph: "m-0 mt-5 first:mt-0 leading-relaxed relative",
 
   heading: {
-    h1: "text-3xl font-bold mt-12 mb-4 text-foreground",
-    h2: "text-2xl font-bold mt-10 mb-3 text-foreground",
-    h3: "text-xl font-semibold mt-8 mb-3 text-foreground",
-    h4: "text-lg font-semibold mt-8 mb-2 text-foreground",
-    h5: "text-base font-semibold mt-8 mb-2 text-foreground",
-    h6: "text-sm font-semibold mt-8 mb-2 text-foreground",
+    h1: "text-3xl font-bold mt-12 mb-4 text-foreground first:mt-0",
+    h2: "text-2xl font-bold mt-10 mb-3 text-foreground first:mt-0",
+    h3: "text-xl font-semibold mt-8 mb-3 text-foreground first:mt-0",
+    h4: "text-lg font-semibold mt-8 mb-2 text-foreground first:mt-0",
+    h5: "text-base font-semibold mt-8 mb-2 text-foreground first:mt-0",
+    h6: "text-sm font-semibold mt-8 mb-2 text-foreground first:mt-0",
   },
 
   quote:
-    "pl-4 py-1.5 my-6 border-l-4 border-muted-foreground/30 text-muted-foreground italic bg-muted/20 rounded-r will-change-auto",
+    "pl-4 py-1.5 my-6 border-l-4 border-muted-foreground/30 text-muted-foreground italic bg-muted/20 rounded-r will-change-auto first:mt-0",
 
   list: {
     nested: {
@@ -29,14 +29,14 @@ export const theme: EditorThemeClasses = {
       "list-[upper-roman] list-outside ml-6",
       "list-[lower-roman] list-outside ml-6",
     ],
-    ol: "list-decimal list-outside my-6 ml-6 space-y-1",
-    ul: "list-disc list-outside my-6 ml-6 space-y-1",
+    ol: "list-decimal list-outside my-6 ml-6 space-y-1 first:mt-0",
+    ul: "list-disc list-outside my-6 ml-6 space-y-1 first:mt-0",
     listitem: "pl-2 leading-relaxed",
     listitemChecked:
       "relative flex items-center gap-2 list-none outline-none text-muted-foreground/50 line-through before:content-[''] before:flex-shrink-0 before:mt-1 before:size-4 before:rounded-[0.25rem] before:border before:border-foreground before:bg-foreground before:cursor-pointer before:flex before:items-center before:justify-center before:[content:'✓'] before:text-background before:text-xs before:font-bold",
     listitemUnchecked:
       "relative flex items-center gap-2 list-none outline-none before:content-[''] before:flex-shrink-0 before:mt-1 before:size-4 before:rounded-[0.25rem] before:border before:border-border before:bg-muted before:cursor-pointer hover:before:border-foreground/50 transition-colors duration-80",
-    checklist: "my-6 space-y-2 pl-1",
+    checklist: "my-6 space-y-2 pl-1 first:mt-0",
   },
 
   text: {
@@ -54,7 +54,7 @@ export const theme: EditorThemeClasses = {
     uppercase: "uppercase",
   },
 
-  code: "relative block bg-muted/80 dark:bg-muted/60 rounded-md overflow-x-auto my-4 text-sm leading-relaxed px-4 py-3 font-mono border border-border/50",
+  code: "relative block bg-muted/80 dark:bg-muted/60 rounded-md overflow-x-auto my-4 text-sm leading-relaxed px-4 py-3 font-mono border border-border/50 first:mt-0",
   codeHighlight: {
     atrule: "text-blue-600 dark:text-blue-400",
     attr: "text-blue-600 dark:text-blue-400",

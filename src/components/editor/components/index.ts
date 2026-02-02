@@ -7,3 +7,4 @@ export * from "./equation-editor";
 export * from "./image-resizer";
 export * from "./katex-equation-alterer";
 export * from "./katex-renderer";
+export * from "./layout-dialog";

@@ -15,7 +15,7 @@ import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { TablePlugin } from "@lexical/react/LexicalTablePlugin";
 import type { EditorState, LexicalEditor } from "lexical";
 import type React from "react";
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { EDITOR_CONFIG } from "./lib/configs";
 import type { EditorProps } from "./lib/types/editor";
@@ -27,6 +27,8 @@ import { Toolbar } from "./plugins/toolbar";
 import { debounce } from "./lib/debounce";
 import EquationsPlugin from "./plugins/equations";
 import ExcalidrawPlugin from "./plugins/excalidraw";
+import DraggableBlockPlugin from "./plugins/draggable-block";
+import { LayoutPlugin } from "./plugins/layout";
 
 function EditorContent({
   placeholder = "Start writing ...",
@@ -43,7 +45,6 @@ function EditorContent({
       minHeight,
       maxHeight,
       caretColor: "hsl(var(--editor-primary))",
-      lineHeight: "1.7",
     }),
     [minHeight, maxHeight],
   );
@@ -54,7 +55,7 @@ function EditorContent({
         contentEditable={
           <ContentEditable
             className={cn(
-              "p-6 md:p-8",
+              "pl-12 pr-6 py-6 md:pr-8 md:py-8",
               "outline-none",
               "max-w-none",
               "w-full",
@@ -71,7 +72,7 @@ function EditorContent({
         }
         ErrorBoundary={LexicalErrorBoundary}
         placeholder={
-          <div className="absolute top-6 md:top-8 left-6 md:left-8 text-muted-foreground/60 pointer-events-none select-none text-base md:text-lg">
+          <div className="absolute top-6 md:top-8 left-12 md:left-16 text-muted-foreground/60 pointer-events-none select-none text-base md:text-lg">
             {placeholder}
           </div>
         }
@@ -84,11 +85,13 @@ function EditorPlugins({
   showFloatingToolbar = true,
   enableSpeechToText = false,
   customPlugins = [],
+  anchorElem = document.body,
   onChange = () => {},
 }: {
   showFloatingToolbar?: boolean;
   enableSpeechToText?: boolean;
   customPlugins?: React.ComponentType[];
+  anchorElem?: HTMLElement;
   onChange: (
     editorState: EditorState,
     editor: LexicalEditor,
@@ -118,6 +121,8 @@ function EditorPlugins({
       <SlashCommandPlugin />
       <EquationsPlugin />
       <ExcalidrawPlugin />
+      <LayoutPlugin />
+      <DraggableBlockPlugin anchorElem={anchorElem} />
       {enableSpeechToText && <SpeechToTextPlugin />}
       <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
       <OnChangePlugin onChange={onChange} />
@@ -143,14 +148,42 @@ export function Editor({
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
 
-  const initialConfig = useMemo(
-    () => ({
+  const [floatingAnchorElem, setFloatingAnchorElem] =
+    useState<HTMLDivElement | null>(null);
+
+  const onRef = (_floatingAnchorElem: HTMLDivElement) => {
+    if (_floatingAnchorElem !== null) {
+      setFloatingAnchorElem(_floatingAnchorElem);
+    }
+  };
+  const initialConfig = useMemo(() => {
+    let editorState = null;
+    if (
+      initialValue &&
+      typeof initialValue === "string" &&
+      initialValue.trim() !== ""
+    ) {
+      try {
+        const parsed = JSON.parse(initialValue);
+        if (parsed && typeof parsed === "object" && parsed.root) {
+          editorState = initialValue;
+        } else {
+          console.warn(
+            "Parsed JSON is not a valid Lexical state (missing root), falling back to default.",
+            parsed,
+          );
+        }
+      } catch (e) {
+        console.warn("Invalid initialValue JSON, falling back to default.", e);
+      }
+    }
+
+    return {
       ...EDITOR_CONFIG,
-      editorState: initialValue?.trim() || null,
+      editorState,
       editable: !readOnly,
-    }),
-    [initialValue, readOnly],
-  );
+    };
+  }, [initialValue, readOnly]);
 
   const handleEditorChange = useCallback(
     debounce((editorState: EditorState) => {
@@ -164,7 +197,7 @@ export function Editor({
   return (
     <div className={cn("w-full", className)}>
       <LexicalComposer initialConfig={initialConfig}>
-        <div className="relative overflow-hidden w-full">
+        <div className="relative overflow-hidden w-full" ref={onRef}>
           {showToolbar && <Toolbar enableSpeechToText={enableSpeechToText} />}
 
           <EditorContent
@@ -180,6 +213,7 @@ export function Editor({
             onChange={handleEditorChange}
             showFloatingToolbar={showFloatingToolbar}
             enableSpeechToText={enableSpeechToText}
+            anchorElem={floatingAnchorElem || undefined}
           />
         </div>
       </LexicalComposer>

@@ -255,3 +255,35 @@
 .excalidraw ::-webkit-scrollbar-thumb:hover {
   background: var(--color-primary-light);
 }
+
+.lexical-layout-container {
+  border: 1px var(--border);
+  border-radius: 0.375rem;
+  padding: 0.5rem;
+  margin: 0.75rem 0;
+  background: color-mix(in srgb, var(--muted), transparent 70%);
+  transition: all 0.2s ease;
+}
+
+.lexical-layout-container:hover {
+  border-color: color-mix(in srgb, var(--primary), transparent 50%);
+  background: color-mix(in srgb, var(--muted), transparent 60%);
+}
+
+.lexical-layout-item {
+  border: 1px solid color-mix(in srgb, var(--border), transparent 50%);
+  border-radius: 0.25rem;
+  padding: 0.75rem;
+  background: var(--background);
+  transition: border-color 0.2s ease;
+}
+
+.lexical-layout-item:hover {
+  border-color: color-mix(in srgb, var(--primary), transparent 70%);
+}
+
+.lexical-layout-item:focus-within {
+  border-color: var(--primary);
+  outline: 2px solid color-mix(in srgb, var(--primary), transparent 80%);
+  outline-offset: 1px;
+}

@@ -1,6 +1,14 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { INSERT_HORIZONTAL_RULE_COMMAND } from "@lexical/react/LexicalHorizontalRuleNode";
-import { ImageIcon, Minus, Pencil, Plus, Sigma, Table } from "lucide-react";
+import {
+  ImageIcon,
+  LayoutDashboard,
+  Minus,
+  Pencil,
+  Plus,
+  Sigma,
+  Table,
+} from "lucide-react";
 import { Menu, MenuItem, MenuPopup, MenuTrigger } from "@/components/ui/menu";
 import { ToolbarButton } from "./toolbar-button";
 
@@ -9,11 +17,13 @@ export function InsertDropDown({
   setShowImageDialog,
   setShowEquationDialog,
   setShowExcalidrawModal,
+  setShowLayoutDialog,
 }: {
   setShowTableDialog: (show: boolean) => void;
   setShowImageDialog: (show: boolean) => void;
   setShowEquationDialog: (show: boolean) => void;
   setShowExcalidrawModal: (show: boolean) => void;
+  setShowLayoutDialog: (show: boolean) => void;
 }) {
   const [editor] = useLexicalComposerContext();
 
@@ -46,6 +56,13 @@ export function InsertDropDown({
         >
           <ImageIcon className="mr-2 size-4" />
           Image
+        </MenuItem>
+        <MenuItem
+          className="hover:bg-accent/80 transition-colors"
+          onClick={() => setShowLayoutDialog(true)}
+        >
+          <LayoutDashboard className="mr-2 size-4" />
+          Columns
         </MenuItem>
         <MenuItem
           className="hover:bg-accent/80 transition-colors"
