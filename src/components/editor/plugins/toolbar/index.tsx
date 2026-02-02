@@ -74,6 +74,7 @@ const initialState = {
   isCheckList: false,
   isQuote: false,
   isCodeBlock: false,
+  linkUrl: "",
   blockType: "paragraph",
   canUndo: false,
   canRedo: false,
@@ -134,6 +135,7 @@ export function Toolbar({
         isUppercase: false,
         isLowercase: false,
         isTable: false,
+        linkUrl: "",
         blockType: "paragraph",
       };
 
@@ -162,7 +164,7 @@ export function Toolbar({
         newToolbarState.blockType = blockType;
 
         const cell = $findMatchingParent(anchorNode, (node) =>
-          $isTableCellNode(node)
+          $isTableCellNode(node),
         );
         newToolbarState.isTable = cell !== null;
 
@@ -178,6 +180,8 @@ export function Toolbar({
           node = parent;
         }
         newToolbarState.isLink = isLink;
+        newToolbarState.linkUrl =
+          isLink && $isLinkNode(node) ? node.getURL() : "";
 
         newToolbarState.isBulletedList = blockType === "bullet";
         newToolbarState.isNumberedList = blockType === "number";
@@ -211,7 +215,7 @@ export function Toolbar({
           updateToolbar();
           return false;
         },
-        COMMAND_PRIORITY_CRITICAL
+        COMMAND_PRIORITY_CRITICAL,
       ),
       editor.registerCommand(
         CAN_UNDO_COMMAND,
@@ -219,7 +223,7 @@ export function Toolbar({
           dispatch({ type: "SET_CAN_UNDO", payload });
           return false;
         },
-        COMMAND_PRIORITY_CRITICAL
+        COMMAND_PRIORITY_CRITICAL,
       ),
       editor.registerCommand(
         CAN_REDO_COMMAND,
@@ -227,8 +231,8 @@ export function Toolbar({
           dispatch({ type: "SET_CAN_REDO", payload });
           return false;
         },
-        COMMAND_PRIORITY_CRITICAL
-      )
+        COMMAND_PRIORITY_CRITICAL,
+      ),
     );
   }, [editor, updateToolbar]);
 
@@ -236,7 +240,7 @@ export function Toolbar({
     if (!toolbarState.isLink) {
       setShowLinkDialog(true);
     } else {
-      editor.dispatchCommand(TOGGLE_LINK_COMMAND, null);
+      setShowLinkDialog(true);
     }
   };
 
@@ -339,7 +343,7 @@ export function Toolbar({
       <Separator />
       <LinkPopover
         isOpen={showLinkDialog}
-        initialUrl=""
+        initialUrl={toolbarState.linkUrl}
         onClose={() => setShowLinkDialog(false)}
         onSubmit={handleLinkSubmit}
         trigger={
@@ -360,13 +364,6 @@ export function Toolbar({
         setShowEquationDialog={setShowEquationDialog}
         setShowExcalidrawModal={setShowExcalidrawModal}
       />
-
-      {toolbarState.isTable && (
-        <>
-          <Separator />
-          <TableButtons />
-        </>
-      )}
 
       <Separator />
 
@@ -430,13 +427,13 @@ export function Toolbar({
                   appState,
                   elements,
                   files,
-                })
+                }),
               );
               $insertNodes([excalidrawNode]);
               if ($isRootOrShadowRoot(excalidrawNode.getParentOrThrow())) {
                 $wrapNodeInElement(
                   excalidrawNode,
-                  $createParagraphNode
+                  $createParagraphNode,
                 ).selectEnd();
               }
             });
@@ -445,6 +442,13 @@ export function Toolbar({
           }}
           closeOnClickOutside={false}
         />
+      )}
+
+      {toolbarState.isTable && (
+        <>
+          <Separator />
+          <TableButtons />
+        </>
       )}
 
       <Separator />
