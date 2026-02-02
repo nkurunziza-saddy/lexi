@@ -25,7 +25,7 @@ import {
 import * as React from "react";
 
 const ImageComponent = React.lazy(
-  () => import("../../components/image-component")
+  () => import("../../components/image-component"),
 );
 
 export interface ImagePayload {
@@ -97,7 +97,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
       node.__showCaption,
       node.__caption,
       node.__captionsEnabled,
-      node.__key
+      node.__key,
     );
   }
 
@@ -137,7 +137,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
 
   static importDOM(): DOMConversionMap | null {
     return {
-      img: (node: Node) => ({
+      img: (_node: Node) => ({
         conversion: $convertImageElement,
         priority: 0,
       }),
@@ -153,7 +153,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     showCaption?: boolean,
     caption?: LexicalEditor,
     captionsEnabled?: boolean,
-    key?: NodeKey
+    key?: NodeKey,
   ) {
     super(key);
     this.__src = src;
@@ -186,7 +186,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
 
   setWidthAndHeight(
     width: "inherit" | number,
-    height: "inherit" | number
+    height: "inherit" | number,
   ): void {
     const writable = this.getWritable();
     writable.__width = width;
@@ -261,13 +261,13 @@ export function $createImageNode({
       showCaption,
       caption,
       captionsEnabled,
-      key
-    )
+      key,
+    ),
   );
 }
 
 export function $isImageNode(
-  node: LexicalNode | null | undefined
+  node: LexicalNode | null | undefined,
 ): node is ImageNode {
   return node instanceof ImageNode;
 }

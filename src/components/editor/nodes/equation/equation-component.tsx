@@ -49,7 +49,7 @@ export default function EquationComponent({
         }
       });
     },
-    [editor, equationValue, nodeKey]
+    [editor, equationValue, nodeKey],
   );
 
   useEffect(() => {
@@ -66,7 +66,7 @@ export default function EquationComponent({
       return mergeRegister(
         editor.registerCommand(
           SELECTION_CHANGE_COMMAND,
-          (payload) => {
+          (_payload) => {
             const activeElement = document.activeElement;
             const inputElem = inputRef.current;
             if (inputElem !== activeElement) {
@@ -74,11 +74,11 @@ export default function EquationComponent({
             }
             return false;
           },
-          COMMAND_PRIORITY_HIGH
+          COMMAND_PRIORITY_HIGH,
         ),
         editor.registerCommand(
           KEY_ESCAPE_COMMAND,
-          (payload) => {
+          (_payload) => {
             const activeElement = document.activeElement;
             const inputElem = inputRef.current;
             if (inputElem === activeElement) {
@@ -87,8 +87,8 @@ export default function EquationComponent({
             }
             return false;
           },
-          COMMAND_PRIORITY_HIGH
-        )
+          COMMAND_PRIORITY_HIGH,
+        ),
       );
     } else {
       return editor.registerUpdateListener(({ editorState }) => {

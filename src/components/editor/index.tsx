@@ -45,7 +45,7 @@ function EditorContent({
       caretColor: "hsl(var(--editor-primary))",
       lineHeight: "1.7",
     }),
-    [minHeight, maxHeight]
+    [minHeight, maxHeight],
   );
 
   return (
@@ -60,7 +60,7 @@ function EditorContent({
               "w-full",
               "min-h-[inherit]",
               "will-change-auto",
-              className
+              className,
             )}
             readOnly={readOnly}
             style={editorStyle}
@@ -92,12 +92,12 @@ function EditorPlugins({
   onChange: (
     editorState: EditorState,
     editor: LexicalEditor,
-    tags: Set<string>
+    tags: Set<string>,
   ) => void;
 }) {
   const pluginElements = useMemo(
     () => customPlugins.map((Plugin, index) => <Plugin key={index} />),
-    [customPlugins]
+    [customPlugins],
   );
 
   return (
@@ -149,7 +149,7 @@ export function Editor({
       editorState: initialValue?.trim() || null,
       editable: !readOnly,
     }),
-    [initialValue, readOnly]
+    [initialValue, readOnly],
   );
 
   const handleEditorChange = useCallback(
@@ -158,7 +158,7 @@ export function Editor({
       const jsonString = JSON.stringify(jsonState);
       onChangeRef.current?.(jsonString);
     }, 300),
-    []
+    [],
   );
 
   return (
